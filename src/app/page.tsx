@@ -159,8 +159,8 @@ export default function Home() {
     try {
       const res = await fetch(`/api/history?client_name=${encodeURIComponent(clientName)}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Errore eliminazione');
-      if (mainTab === 'volo') fetchHistory('volo');
-      else fetchHistory(mainTab, mode);
+      if (mainTab === 'volo') await fetchHistory('volo');
+      else await fetchHistory(mainTab, mode);
     } catch (error) {
       console.error('Error deleting entry:', error);
       alert('Errore durante l\'eliminazione del record.');
@@ -515,7 +515,7 @@ export default function Home() {
               status: status
             })
           });
-          fetchHistory(mainTab);
+          await fetchHistory(mainTab, mode);
         } catch (err) {
           console.error('Errore nel salvataggio storico:', err);
         }
@@ -577,7 +577,7 @@ export default function Home() {
                status: 'conferma'
              })
            });
-           fetchHistory(mainTab);
+           await fetchHistory(mainTab, mode);
         }
       }
     } catch (err) {

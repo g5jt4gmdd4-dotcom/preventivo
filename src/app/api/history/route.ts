@@ -58,7 +58,7 @@ export async function GET(request: Request) {
         WHERE (${status} = 'all' OR status = ${status})
         AND (data->>'mode' = 'stay' OR data->>'mode' IS NULL)
         ORDER BY updated_at DESC
-        LIMIT 50;
+        LIMIT 100;
       `;
       rows = result.rows;
     } else if (mode === 'flight') {
@@ -68,7 +68,7 @@ export async function GET(request: Request) {
         WHERE (${status} = 'all' OR status = ${status})
         AND data->>'mode' = 'flight'
         ORDER BY updated_at DESC
-        LIMIT 50;
+        LIMIT 100;
       `;
       rows = result.rows;
     } else {
@@ -77,7 +77,7 @@ export async function GET(request: Request) {
         FROM quotes 
         WHERE (${status} = 'all' OR status = ${status})
         ORDER BY updated_at DESC
-        LIMIT 50;
+        LIMIT 100;
       `;
       rows = result.rows;
     }
