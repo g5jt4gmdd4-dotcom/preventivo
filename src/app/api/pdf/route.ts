@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Workaround per Vercel Node 20: Sparticuz ha bisogno di sapere il runtime per caricare i binari corretti (inclusa libnss3.so)
-if (!process.env.AWS_LAMBDA_JS_RUNTIME) {
-  process.env.AWS_LAMBDA_JS_RUNTIME = 'nodejs20.x';
-}
-
-import chromium from '@sparticuz/chromium';
+import chromium from '@sparticuz/chromium-min';
 import puppeteer from 'puppeteer-core';
 
 // Su Vercel la funzione può impiegare 20-40s (avvio Chromium + rendering). Serve maxDuration alto.
@@ -34,13 +29,16 @@ export async function POST(req: NextRequest) {
       // Eseguibile Chrome predefinito su Windows
       executablePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
     } else {
-      executablePath = await chromium.executablePath();
+      // Usa pacchetto remoto per aggirare il limite Vercel 50MB e mancate dipendenze
+      executablePath = await chromium.executablePath(
+        'https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar'
+      );
     }
 
     browser = await puppeteer.launch({
       args: isLocal 
         ? ['--no-sandbox', '--disable-setuid-sandbox'] 
-        : [...chromium.args, '--disable-gpu', '--single-process', '--no-zygote', '--disable-dev-shm-usage'],
+        : chromium.args,
       defaultViewport: chromium.defaultViewport,
       executablePath,
       headless: isLocal ? true : chromium.headless,
