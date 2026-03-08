@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { calculateQuote, calculateFlightQuote, AccommodationRequest, DiscountInfo, RestaurantRequest, FlightRequest, formatEuro } from '@/lib/calculator';
-import { generateHtml, generatePlainText } from '@/lib/template';
+import { generateHtml, generatePlainText, generateFlightModuleHtml, type FlightModuleData, type FlightOperativo } from '@/lib/template';
 import { Copy, FileText, Code, Eye, Plus, Trash2, Tag, Euro, Utensils, Home as HomeIcon, Plane, Users, RotateCcw, FileCheck, Printer, FileDown } from 'lucide-react';
 import { saveAs } from 'file-saver';
 import { generateDocx } from '@/lib/docxGenerator';
@@ -63,8 +63,16 @@ const DEFAULT_FLIGHT_REQUEST: FlightRequest = {
   includeForfait: true
 };
 
+const EMPTY_OPERATIVO: FlightOperativo = {
+  compagnia: '',
+  tratta: '',
+  data: '',
+  orarioPartenza: '',
+  orarioArrivo: '',
+};
+
 export default function Home() {
-  const [mainTab, setMainTab] = useState<'preventivi' | 'conferme'>('preventivi');
+  const [mainTab, setMainTab] = useState<'preventivi' | 'conferme' | 'volo'>('preventivi');
 
   const [mode, setMode] = useState<'stay' | 'flight'>('stay');
   const [customerFirstName, setCustomerFirstName] = useState('');
@@ -99,6 +107,18 @@ export default function Home() {
   // --- Flight Mode State ---
   const [flightRequest, setFlightRequest] = useState<FlightRequest>(DEFAULT_FLIGHT_REQUEST);
 
+  // --- Sezione Volo (modulo operativo trasporti) — stato separato ---
+  const [voloPraticaNumber, setVoloPraticaNumber] = useState('');
+  const [voloPreventivoNumber, setVoloPreventivoNumber] = useState('');
+  const [voloPreventivoCreatedAt, setVoloPreventivoCreatedAt] = useState('');
+  const [voloBagaglioStivaKg, setVoloBagaglioStivaKg] = useState(15);
+  const [voloBagaglioManoKg, setVoloBagaglioManoKg] = useState(7);
+  const [voloOtherPassengers, setVoloOtherPassengers] = useState('');
+  const [voloCompagnia, setVoloCompagnia] = useState('');
+  const [voloCittaPartenza, setVoloCittaPartenza] = useState('');
+  const [voloAndata, setVoloAndata] = useState<FlightOperativo>({ ...EMPTY_OPERATIVO });
+  const [voloRitorno, setVoloRitorno] = useState<FlightOperativo>({ ...EMPTY_OPERATIVO });
+
   const [activeTab, setActiveTab] = useState<'preview' | 'html' | 'text'>('preview');
 
   const [history, setHistory] = useState<HistoryEntry[]>([]);
@@ -107,8 +127,13 @@ export default function Home() {
   const fetchHistory = async (tabStr = mainTab, currentMode = mode) => {
     try {
       setLoadingHistory(true);
-      const statusParam = tabStr === 'conferme' ? 'all' : 'preventivo';
-      let url = `/api/history?status=${statusParam}&mode=${currentMode}`;
+      let url: string;
+      if (tabStr === 'volo') {
+        url = `/api/history?status=conferma&mode=flight`;
+      } else {
+        const statusParam = tabStr === 'conferme' ? 'all' : 'preventivo';
+        url = `/api/history?status=${statusParam}&mode=${currentMode}`;
+      }
       const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
@@ -122,14 +147,61 @@ export default function Home() {
   };
 
   useEffect(() => {
-    fetchHistory(mainTab, mode);
+    if (mainTab === 'volo') {
+      fetchHistory('volo');
+    } else {
+      fetchHistory(mainTab, mode);
+    }
   }, [mainTab, mode]);
+
+  const deleteEntry = async (clientName: string) => {
+    if (!window.confirm('Sei sicuro di voler eliminare questo record?')) return;
+    try {
+      const res = await fetch(`/api/history?client_name=${encodeURIComponent(clientName)}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Errore eliminazione');
+      if (mainTab === 'volo') fetchHistory('volo');
+      else fetchHistory(mainTab, mode);
+    } catch (error) {
+      console.error('Error deleting entry:', error);
+      alert('Errore durante l\'eliminazione del record.');
+    }
+  };
 
   const restoreHistory = (entry: HistoryEntry) => {
     const data = entry.data;
+
+    if (mainTab === 'volo') {
+      const names = entry.client_name.split(' ');
+      setCustomerFirstName(names[0] || '');
+      setCustomerLastName(names.slice(1).join(' ') || '');
+      setVoloOtherPassengers(data.otherPassengers ?? data.voloOtherPassengers ?? '');
+      setVoloCompagnia(data.voloCompagnia ?? data.flightOperativoAndata?.compagnia ?? '');
+      const citta = data.voloCittaPartenza ?? (data.flightOperativoAndata?.tratta ? data.flightOperativoAndata.tratta.replace(/\s*-\s*Lampedusa\s*$/i, '').trim() : '');
+      setVoloCittaPartenza(citta);
+      const andataBase = data.flightOperativoAndata ? { ...EMPTY_OPERATIVO, ...data.flightOperativoAndata } : { ...EMPTY_OPERATIVO };
+      const ritornoBase = data.flightOperativoRitorno ? { ...EMPTY_OPERATIVO, ...data.flightOperativoRitorno } : { ...EMPTY_OPERATIVO };
+      const year = new Date().getFullYear();
+      if (data.flightRequest?.week) {
+        const parts = data.flightRequest.week.split(/\s*-\s*/).map((s: string) => s.trim());
+        if (parts[0]) andataBase.data = parts[0].includes('/') && parts[0].length <= 5 ? `${parts[0]}/${year}` : parts[0];
+        if (parts[1]) ritornoBase.data = parts[1].includes('/') && parts[1].length <= 5 ? `${parts[1]}/${year}` : parts[1];
+      }
+      if (data.arrivalInfo !== undefined && data.arrivalInfo !== '') andataBase.orarioArrivo = data.arrivalInfo;
+      if (data.departureInfo !== undefined && data.departureInfo !== '') ritornoBase.orarioPartenza = data.departureInfo;
+      setVoloAndata(andataBase);
+      setVoloRitorno(ritornoBase);
+      if (data.voloPraticaNumber !== undefined) setVoloPraticaNumber(data.voloPraticaNumber);
+      if (data.voloPreventivoNumber !== undefined) setVoloPreventivoNumber(data.voloPreventivoNumber);
+      if (entry.updated_at) {
+        const d = new Date(entry.updated_at);
+        setVoloPreventivoCreatedAt(d.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' }));
+      } else setVoloPreventivoCreatedAt('');
+      if (data.voloBagaglioStivaKg !== undefined) setVoloBagaglioStivaKg(Number(data.voloBagaglioStivaKg) || 15);
+      if (data.voloBagaglioManoKg !== undefined) setVoloBagaglioManoKg(Number(data.voloBagaglioManoKg) || 7);
+      return;
+    }
+
     if (data.mode) setMode(data.mode);
-    
-    // Piccolo delay per garantire che il cambio modalità sia processato
     setTimeout(() => {
       const names = entry.client_name.split(' ');
       setCustomerFirstName(names[0] || '');
@@ -151,8 +223,6 @@ export default function Home() {
       if (data.restaurantDiscount) setRestaurantDiscount(data.restaurantDiscount);
       if (data.flightRequest) setFlightRequest(data.flightRequest);
       if (data.useEfesoIban !== undefined) setUseEfesoIban(data.useEfesoIban);
-      
-      // Passa alla tab preview per mostrare il risultato
       setActiveTab('preview');
     }, 0);
   };
@@ -386,6 +456,24 @@ export default function Home() {
   const htmlOutput = useMemo(() => quoteWithCustomer ? generateHtml(quoteWithCustomer) : '', [quoteWithCustomer]);
   const textOutput = useMemo(() => quoteWithCustomer ? generatePlainText(quoteWithCustomer) : '', [quoteWithCustomer]);
 
+  const flightModuleHtml = useMemo(() => {
+    const trattaAndata = voloCittaPartenza.trim() ? `${voloCittaPartenza.trim()} - Lampedusa` : '';
+    const trattaRitorno = voloCittaPartenza.trim() ? `Lampedusa - ${voloCittaPartenza.trim()}` : '';
+    const data: FlightModuleData = {
+      praticaNumber: voloPraticaNumber,
+      preventivoNumber: voloPreventivoNumber,
+      preventivoCreatedAt: voloPreventivoCreatedAt || undefined,
+      bagaglioStivaKg: voloBagaglioStivaKg,
+      bagaglioManoKg: voloBagaglioManoKg,
+      customerFirstName,
+      customerLastName,
+      otherPassengers: voloOtherPassengers,
+      andata: { ...voloAndata, compagnia: voloCompagnia, tratta: trattaAndata },
+      ritorno: { ...voloRitorno, compagnia: voloCompagnia, tratta: trattaRitorno },
+    };
+    return generateFlightModuleHtml(data);
+  }, [voloPraticaNumber, voloPreventivoNumber, voloPreventivoCreatedAt, voloBagaglioStivaKg, voloBagaglioManoKg, customerFirstName, customerLastName, voloOtherPassengers, voloCompagnia, voloCittaPartenza, voloAndata, voloRitorno]);
+
   // Fix image path for GitHub Pages
   const logoPath = process.env.NODE_ENV === 'production' ? '/Prev3/logo.png' : '/logo.png';
 
@@ -526,12 +614,187 @@ export default function Home() {
             <FileCheck className="w-6 h-6 mb-1" />
             Conf.
           </button>
+          <button
+            onClick={() => setMainTab('volo')}
+            className={`w-full flex flex-col items-center justify-center gap-1 p-3 rounded-xl text-[10px] font-bold uppercase transition-all ${
+              mainTab === 'volo' ? 'bg-sky-600 text-white shadow-lg shadow-sky-500/30 ring-2 ring-sky-400/50' : 'text-slate-400 hover:bg-white/10 hover:text-white'
+            }`}
+            title="Modulo Operativo Trasporti"
+          >
+            <Plane className="w-6 h-6 mb-1" />
+            Volo
+          </button>
         </nav>
       </aside>
 
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto h-screen relative">
         <div className="max-w-7xl mx-auto p-4 md:p-8">
+          {mainTab === 'volo' ? (
+            <>
+            {/* ---------- Sezione Volo: solo modulo operativo trasporti ---------- */}
+            <div className="bg-white rounded-xl shadow-2xl overflow-hidden border border-slate-200">
+              <div className="p-8 text-white bg-gradient-to-r from-sky-600 to-sky-400">
+                <h1 className="text-3xl font-extrabold tracking-tight uppercase">Modulo Operativo Trasporti</h1>
+                <p className="text-white/90 mt-2 text-lg font-medium">Dati pratica, nominativi e operativo voli per la stampa</p>
+              </div>
+              <div className="grid lg:grid-cols-[400px,1fr] gap-0">
+                <div className="p-6 bg-slate-50 border-r border-slate-200 space-y-6">
+                  <section className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                    <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">Dati Pratica</h3>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><label className="block text-[10px] font-bold text-slate-500 mb-0.5 uppercase">N. Pratica</label><input type="text" className="w-full p-2 border border-slate-200 rounded-lg text-sm" value={voloPraticaNumber} onChange={(e) => setVoloPraticaNumber(e.target.value)} placeholder="Es. 2024-001" /></div>
+                      <div><label className="block text-[10px] font-bold text-slate-500 mb-0.5 uppercase">N. Preventivo</label><input type="text" className="w-full p-2 border border-slate-200 rounded-lg text-sm" value={voloPreventivoNumber} onChange={(e) => setVoloPreventivoNumber(e.target.value)} placeholder="Es. 123" /></div>
+                    </div>
+                  </section>
+                  <section className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                    <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">Passeggeri</h3>
+                    <div className="grid grid-cols-2 gap-3 mb-3">
+                      <div><label className="block text-[10px] font-bold text-slate-500 mb-0.5 uppercase">Capogruppo – Nome</label><input type="text" className="w-full p-2 border border-slate-200 rounded-lg text-sm" value={customerFirstName} onChange={(e) => setCustomerFirstName(e.target.value)} placeholder="Nome" /></div>
+                      <div><label className="block text-[10px] font-bold text-slate-500 mb-0.5 uppercase">Capogruppo – Cognome</label><input type="text" className="w-full p-2 border border-slate-200 rounded-lg text-sm" value={customerLastName} onChange={(e) => setCustomerLastName(e.target.value)} placeholder="Cognome" /></div>
+                    </div>
+                    <div><label className="block text-[10px] font-bold text-slate-500 mb-0.5 uppercase">Altri passeggeri (uno per riga: Cognome Nome)</label><textarea className="w-full p-2 border border-slate-200 rounded-lg text-sm min-h-[80px]" value={voloOtherPassengers} onChange={(e) => setVoloOtherPassengers(e.target.value)} placeholder="Rossi Mario&#10;Bianchi Laura" /></div>
+                  </section>
+                  <section className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                    <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">Operativo Voli</h3>
+                    <p className="text-[10px] text-slate-500 mb-3">Arrivo e ripartenza sempre Lampedusa; indica la città di partenza.</p>
+                    <div className="space-y-3 mb-4">
+                      <div><label className="block text-[10px] font-bold text-slate-500 mb-0.5">Compagnia (andata e ritorno)</label><input type="text" className="w-full p-2 border border-slate-200 rounded-lg text-sm" value={voloCompagnia} onChange={(e) => setVoloCompagnia(e.target.value)} placeholder="Es. Ryanair" /></div>
+                      <div><label className="block text-[10px] font-bold text-slate-500 mb-0.5">Città di partenza</label><input type="text" className="w-full p-2 border border-slate-200 rounded-lg text-sm" value={voloCittaPartenza} onChange={(e) => setVoloCittaPartenza(e.target.value)} placeholder="Es. BGY, MXP" /></div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <div className="font-bold text-sky-700 text-xs mb-2">Andata</div>
+                        <div className="space-y-2">
+                          <div><label className="block text-[10px] font-bold text-slate-500 mb-0.5">Data</label><input type="text" className="w-full p-2 border border-slate-200 rounded-lg text-sm" value={voloAndata.data} onChange={(e) => setVoloAndata((a) => ({ ...a, data: e.target.value }))} placeholder="gg/mm/aaaa" /></div>
+                          <div><label className="block text-[10px] font-bold text-slate-500 mb-0.5">Or. Partenza</label><input type="text" className="w-full p-2 border border-slate-200 rounded-lg text-sm" value={voloAndata.orarioPartenza} onChange={(e) => setVoloAndata((a) => ({ ...a, orarioPartenza: e.target.value }))} /></div>
+                          <div><label className="block text-[10px] font-bold text-slate-500 mb-0.5">Or. Arrivo</label><input type="text" className="w-full p-2 border border-slate-200 rounded-lg text-sm" value={voloAndata.orarioArrivo} onChange={(e) => setVoloAndata((a) => ({ ...a, orarioArrivo: e.target.value }))} /></div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="font-bold text-sky-700 text-xs mb-2">Ritorno</div>
+                        <div className="space-y-2">
+                          <div><label className="block text-[10px] font-bold text-slate-500 mb-0.5">Data</label><input type="text" className="w-full p-2 border border-slate-200 rounded-lg text-sm" value={voloRitorno.data} onChange={(e) => setVoloRitorno((r) => ({ ...r, data: e.target.value }))} placeholder="gg/mm/aaaa" /></div>
+                          <div><label className="block text-[10px] font-bold text-slate-500 mb-0.5">Or. Partenza</label><input type="text" className="w-full p-2 border border-slate-200 rounded-lg text-sm" value={voloRitorno.orarioPartenza} onChange={(e) => setVoloRitorno((r) => ({ ...r, orarioPartenza: e.target.value }))} /></div>
+                          <div><label className="block text-[10px] font-bold text-slate-500 mb-0.5">Or. Arrivo</label><input type="text" className="w-full p-2 border border-slate-200 rounded-lg text-sm" value={voloRitorno.orarioArrivo} onChange={(e) => setVoloRitorno((r) => ({ ...r, orarioArrivo: e.target.value }))} /></div>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+                  <section className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                    <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">Note – Bagaglio</h3>
+                    <p className="text-[10px] text-slate-500 mb-3">Valori usati nella nota del modulo stampato (bagaglio in stiva + a mano).</p>
+                    <div className="flex items-center gap-4 flex-wrap">
+                      <div className="flex items-center gap-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Stiva (kg)</label>
+                        <input type="number" min="0" max="99" className="w-14 p-2 border border-slate-200 rounded-lg text-sm text-center" value={voloBagaglioStivaKg} onChange={(e) => setVoloBagaglioStivaKg(Math.max(0, parseInt(e.target.value, 10) || 0))} />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">A mano (kg)</label>
+                        <input type="number" min="0" max="99" className="w-14 p-2 border border-slate-200 rounded-lg text-sm text-center" value={voloBagaglioManoKg} onChange={(e) => setVoloBagaglioManoKg(Math.max(0, parseInt(e.target.value, 10) || 0))} />
+                      </div>
+                    </div>
+                  </section>
+                </div>
+                <div className="bg-slate-200 min-h-[500px] flex flex-col">
+                  <div className="bg-slate-50 px-4 py-2 border-b border-slate-200 flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-600 uppercase">Anteprima modulo</span>
+                  </div>
+                  <div className="flex-1 overflow-auto p-4">
+                    <iframe srcDoc={flightModuleHtml} title="Anteprima modulo volo" className="w-full min-h-[800px] border border-slate-200 rounded-lg bg-white shadow-inner" />
+                  </div>
+                </div>
+              </div>
+              <div className="p-6 border-t border-slate-200 bg-slate-50">
+                <h3 className="text-lg font-bold text-slate-800 flex items-center mb-4"><RotateCcw className="w-4 h-4 mr-2 text-sky-600" /> Storico conferme volo</h3>
+                {loadingHistory ? <div className="text-slate-500 text-sm">Caricamento...</div> : history.length === 0 ? <div className="text-slate-500 text-sm">Nessuna conferma volo. Carica da Conferme (Volo + Soggiorno) per vederla qui.</div> : (
+                  <div className="bg-white border border-slate-200 rounded-lg overflow-hidden max-h-[280px] overflow-y-auto">
+                    <table className="w-full text-left text-sm text-slate-700">
+                      <thead className="text-xs uppercase bg-slate-100 text-slate-500 sticky top-0">
+                        <tr><th className="px-4 py-2 font-bold">Nome Cliente</th><th className="px-4 py-2 font-bold">Data</th><th className="px-4 py-2 text-center font-bold">Azione</th></tr>
+                      </thead>
+                      <tbody>
+                        {history.map((entry) => (
+                          <tr key={entry.client_name} className="border-b border-slate-100 bg-emerald-50/50 hover:bg-emerald-100">
+                            <td className="px-4 py-2 font-bold text-slate-800 truncate max-w-[200px]">
+                              <div className="flex items-center gap-2">
+                                {entry.data?.mode === 'flight' && <Plane className="w-3.5 h-3.5 text-blue-500 shrink-0 mr-1.5" />}
+                                {entry.client_name}
+                              </div>
+                            </td>
+                            <td className="px-4 py-2 text-xs text-slate-500">{new Date(entry.updated_at).toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
+                            <td className="px-4 py-2 text-center">
+                              <div className="flex items-center justify-center gap-2">
+                                <button type="button" onClick={() => restoreHistory(entry)} className="bg-sky-100 text-sky-700 hover:bg-sky-200 px-3 py-1 rounded text-xs font-bold">Carica</button>
+                                <button type="button" onClick={() => deleteEntry(entry.client_name)} className="p-1.5 rounded text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors" title="Elimina">
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* FAB Salva PDF con nome — sezione Volo (tondo in basso a destra come Conferme) */}
+            {mainTab === 'volo' && (
+              <div className="fixed bottom-8 right-8 flex flex-col gap-4 z-50">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const fileName = `Modulo_Volo_${customerLastName || 'cliente'}.pdf`.trim();
+                    try {
+                      const response = await fetch('/api/pdf', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ html: flightModuleHtml, fileName }),
+                      });
+                      if (!response.ok) throw new Error('PDF generation failed');
+                      const blob = await response.blob();
+                      if ('showSaveFilePicker' in window) {
+                        try {
+                          const handle = await (window as any).showSaveFilePicker({
+                            suggestedName: fileName,
+                            types: [{ description: 'Documento PDF', accept: { 'application/pdf': ['.pdf'] } }],
+                          });
+                          const writable = await handle.createWritable();
+                          await writable.write(blob);
+                          await writable.close();
+                        } catch (err: any) {
+                          if (err.name !== 'AbortError') throw err;
+                        }
+                      } else {
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = fileName;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(a);
+                      }
+                    } catch (error) {
+                      console.error('Error saving PDF:', error);
+                      alert('Errore durante la generazione del PDF.');
+                    }
+                  }}
+                  className="bg-purple-600 hover:bg-purple-700 text-white w-14 h-14 rounded-full shadow-2xl shadow-purple-600/30 flex items-center justify-center transform hover:scale-110 transition-all group"
+                  title="Salva PDF con nome"
+                >
+                  <FileText className="w-6 h-6" />
+                  <span className="absolute right-full mr-4 bg-slate-800 text-white text-xs font-bold px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                    Salva PDF con nome
+                  </span>
+                </button>
+              </div>
+            )}
+            </>
+          ) : (
+          <>
           <div className="bg-white rounded-xl shadow-2xl overflow-hidden border border-slate-200">
             <div className={`p-8 text-white flex items-center gap-6 transition-colors duration-500 ${mainTab === 'conferme' ? 'bg-gradient-to-r from-emerald-600 to-emerald-400' : 'bg-gradient-to-r from-blue-700 to-blue-500'}`}>
               <div>
@@ -1694,6 +1957,7 @@ export default function Home() {
                             <td className="px-4 py-2 font-bold text-slate-800 truncate max-w-[150px]" title={entry.client_name}>
                               <div className="flex items-center gap-2">
                                 {entry.status === 'conferma' && <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-sm shrink-0"></span>}
+                                {entry.data?.mode === 'flight' && <Plane className="w-3.5 h-3.5 text-blue-500 shrink-0 mr-1.5" />}
                                 {entry.client_name}
                               </div>
                             </td>
@@ -1704,16 +1968,26 @@ export default function Home() {
                               {formatEuro(entry.data.quote?.finalTotal || 0)} €
                             </td>
                             <td className="px-4 py-2 text-center">
-                              <button
-                                onClick={() => restoreHistory(entry)}
-                                className={`${
-                                  entry.status === 'conferma' 
-                                    ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' 
-                                    : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                                } px-3 py-1 rounded text-xs font-bold transition-colors inline-block`}
-                              >
-                                {entry.status === 'conferma' ? 'Vedi' : 'Carica'}
-                              </button>
+                              <div className="flex items-center justify-center gap-2">
+                                <button
+                                  onClick={() => restoreHistory(entry)}
+                                  className={`${
+                                    entry.status === 'conferma' 
+                                      ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' 
+                                      : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                                  } px-3 py-1 rounded text-xs font-bold transition-colors inline-block`}
+                                >
+                                  {entry.status === 'conferma' ? 'Vedi' : 'Carica'}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => deleteEntry(entry.client_name)}
+                                  className="p-1.5 rounded text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors"
+                                  title="Elimina"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -1725,6 +1999,8 @@ export default function Home() {
             </div>
 
           </div>
+          </>
+          )}
         </div>
       </div>
     </main>

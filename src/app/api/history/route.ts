@@ -88,3 +88,30 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    await initDb();
+    const { searchParams } = new URL(request.url);
+    let clientName = searchParams.get('client_name');
+    if (!clientName) {
+      try {
+        const body = await request.json();
+        clientName = body.client_name ?? body.clientName ?? null;
+      } catch {
+        // no body or invalid JSON
+      }
+    }
+    if (!clientName) {
+      return NextResponse.json(
+        { error: 'client_name is required per eliminare un record.' },
+        { status: 400 }
+      );
+    }
+    await sql`DELETE FROM quotes WHERE client_name = ${clientName}`;
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error('Error in DELETE /api/history:', error);
+    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+  }
+}

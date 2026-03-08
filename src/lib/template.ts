@@ -755,4 +755,182 @@ export function generatePlainText(res: QuoteResult): string {
   return text;
 }
 
+/** Dati operativo volo (andata o ritorno) per il modulo trasporti */
+export interface FlightOperativo {
+  compagnia: string;
+  tratta: string;
+  data: string;
+  orarioPartenza: string;
+  orarioArrivo: string;
+}
+
+/** Dati per generare il modulo operativo trasporti (layout ALBANI BGY.doc) */
+export interface FlightModuleData {
+  praticaNumber: string;
+  preventivoNumber: string;
+  /** Data in cui è stato fatto originariamente il preventivo (es. da storico); formattata gg/mm/aaaa */
+  preventivoCreatedAt?: string;
+  customerFirstName: string;
+  customerLastName: string;
+  otherPassengers: string;
+  /** Kg bagaglio in stiva (editabile dal form) */
+  bagaglioStivaKg?: number;
+  /** Kg bagaglio a mano (editabile dal form) */
+  bagaglioManoKg?: number;
+  andata: FlightOperativo;
+  ritorno: FlightOperativo;
+}
+
+/**
+ * Genera HTML A4 del modulo operativo trasporti (copia fedele layout ALBANI BGY.doc).
+ * Intestazione agenzia, tabella nominativi, box operativo voli, note bagagli/carta imbarco.
+ */
+export function generateFlightModuleHtml(data: FlightModuleData): string {
+  const logoPath = '/logo.png';
+  const efesoLogoPath = '/efeso.png';
+
+  const passengers: { cognome: string; nome: string }[] = [];
+  const mainCognome = (data.customerLastName || '').trim().toUpperCase();
+  const mainNome = (data.customerFirstName || '').trim();
+  if (mainCognome || mainNome) {
+    passengers.push({ cognome: mainCognome, nome: mainNome });
+  }
+  const lines = (data.otherPassengers || '').split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  for (const line of lines) {
+    const parts = line.split(/\s+/);
+    const cognome = (parts[0] || '').toUpperCase();
+    const nome = parts.slice(1).join(' ');
+    passengers.push({ cognome, nome });
+  }
+
+  const rowsHtml =
+    passengers.length > 0
+      ? passengers
+          .map(
+            (p, idx) => {
+              const rowBg = idx % 2 === 0 ? '#f0f9ff' : '#ffffff';
+              return `
+      <tr style="background-color: ${rowBg}; border-bottom: 1px solid #e0f2fe;">
+        <td style="padding: 12px; text-align: left; font-family: Aptos, Calibri, sans-serif; font-size: 10pt; color: #334155;">${p.cognome}</td>
+        <td style="padding: 12px; text-align: left; font-family: Aptos, Calibri, sans-serif; font-size: 10pt; color: #334155;">${p.nome}</td>
+      </tr>`;
+            }
+          )
+          .join('')
+      : `
+      <tr style="background-color: #ffffff; border-bottom: 1px solid #e0f2fe;">
+        <td style="padding: 12px; height: 24px; font-family: Aptos, sans-serif; font-size: 10pt; color: #334155;"></td>
+        <td style="padding: 12px; font-family: Aptos, sans-serif; font-size: 10pt; color: #334155;"></td>
+      </tr>`;
+
+  const a = data.andata || { compagnia: '', tratta: '', data: '', orarioPartenza: '', orarioArrivo: '' };
+  const r = data.ritorno || { compagnia: '', tratta: '', data: '', orarioPartenza: '', orarioArrivo: '' };
+
+  const todayStr = format(new Date(), 'dd/MM/yyyy', { locale: it });
+  const preventivoDateStr = data.preventivoCreatedAt && data.preventivoCreatedAt.trim() ? data.preventivoCreatedAt.trim() : '—';
+
+  return `<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <title>Modulo Operativo Trasporti</title>
+  <style>
+    @page { size: A4; margin: 15mm; }
+    body { font-family: 'Segoe UI', Aptos, Calibri, sans-serif; font-size: 11pt; margin: 0; padding: 15mm; color: #334155; background: #f8fafc; }
+    .page { width: 210mm; min-height: 297mm; box-sizing: border-box; background: #fff; padding: 18px; border-radius: 8px; }
+    table { border-collapse: collapse; width: 100%; }
+    .header-table { margin-bottom: 18px; }
+    .section-title { font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; font-size: 10pt; margin: 18px 0 10px 0; color: #475569; }
+    .operativo-block { margin-bottom: 20px; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: #f8fafc; }
+    .operativo-block .operativo-title { font-weight: 600; font-size: 10pt; color: #0f172a; padding: 10px 12px; background: #f1f5f9; border-bottom: 1px solid #e2e8f0; }
+    .operativo-block table { width: 100%; }
+    .operativo-block td { padding: 8px 12px; font-size: 10pt; border: none; }
+    .operativo-block td:first-child { width: 26%; color: #64748b; font-weight: 500; }
+    .operativo-block td:last-child { color: #0f172a; }
+    .operativo-block tr { border-bottom: 1px solid #e2e8f0; }
+    .operativo-block tr:last-child { border-bottom: none; }
+    .footer-notes { font-size: 9pt; margin-top: 24px; line-height: 1.5; color: #64748b; padding: 14px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; }
+    .footer-notes strong { color: #475569; }
+    .pratica-line { font-size: 10pt; margin-bottom: 8px; color: #475569; }
+    .modulo-title { font-size: 12pt; font-weight: 700; margin-bottom: 16px; text-align: center; color: #1e293b; letter-spacing: 0.02em; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <table class="header-table">
+      <tr>
+        <td style="width: 50%; vertical-align: top; text-align: left; padding-right: 24px;">
+          <img src="${logoPath}" alt="Villaggio La Roccia Camping" style="max-height: 78px; display: block; margin-bottom: 8px;" />
+          <div style="font-size: 9pt; line-height: 1.35; color: #334155;">
+            <strong>Villaggio La Roccia Camping</strong><br />
+            C.da Madonna - 92031 Lampedusa<br />
+            CIR: 19084020B101960 | CIN: IT08420B1B77QEMZ6<br />
+            <a href="https://www.laroccia.net" style="color: #334155; text-decoration: none;">www.laroccia.net</a>
+          </div>
+        </td>
+        <td style="width: 50%; vertical-align: top; padding-left: 24px;">
+          <div style="text-align: right;">
+            <img src="${efesoLogoPath}" alt="Efesovacanze" style="max-height: 78px; display: inline-block; margin-bottom: 8px; vertical-align: top;" />
+            <div style="font-size: 9pt; line-height: 1.35; color: #334155;">
+              <strong>Efesovacanze.com</strong><br />
+              Via Pirandello, 10<br />
+              92031 - Lampedusa e Linosa (AG)<br />
+              P.IVA 02888040843
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+    <div class="modulo-title">Modulo Operativo Trasporti</div>
+
+    <div class="pratica-line"><strong>N. Pratica:</strong> ${(data.praticaNumber || '').trim() || '—'} &nbsp;&nbsp; <strong>Data:</strong> ${todayStr}</div>
+    <div class="pratica-line"><strong>N. Preventivo:</strong> ${(data.preventivoNumber || '').trim() || '—'} &nbsp;&nbsp; <strong>Data:</strong> ${preventivoDateStr}</div>
+
+    <div class="section-title">Elenco nominativi</div>
+    <div style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; margin-bottom: 20px;">
+      <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
+        <thead>
+          <tr style="background-color: #f1f5f9; border-bottom: 1px solid #e2e8f0;">
+            <th style="padding: 12px; text-align: left; color: #475569; font-size: 10pt; text-transform: uppercase; font-family: Aptos, Calibri, sans-serif; width: 40%;">Cognome</th>
+            <th style="padding: 12px; text-align: left; color: #475569; font-size: 10pt; text-transform: uppercase; font-family: Aptos, Calibri, sans-serif; width: 60%;">Nome</th>
+          </tr>
+        </thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+    </div>
+
+    <div class="section-title" style="margin-top: 20px;">Operativo Trasporti</div>
+
+    <div class="operativo-block">
+      <div class="operativo-title">Andata</div>
+      <table>
+        <tr><td>Compagnia</td><td>${a.compagnia || '—'}</td></tr>
+        <tr><td>Tratta</td><td>${a.tratta || '—'}</td></tr>
+        <tr><td>Data</td><td>${a.data || '—'}</td></tr>
+        <tr><td>Orario Partenza</td><td>${a.orarioPartenza || '—'}</td></tr>
+        <tr><td>Orario Arrivo</td><td>${a.orarioArrivo || '—'}</td></tr>
+      </table>
+    </div>
+
+    <div class="operativo-block">
+      <div class="operativo-title">Ritorno</div>
+      <table>
+        <tr><td>Compagnia</td><td>${r.compagnia || '—'}</td></tr>
+        <tr><td>Tratta</td><td>${r.tratta || '—'}</td></tr>
+        <tr><td>Data</td><td>${r.data || '—'}</td></tr>
+        <tr><td>Orario Partenza</td><td>${r.orarioPartenza || '—'}</td></tr>
+        <tr><td>Orario Arrivo</td><td>${r.orarioArrivo || '—'}</td></tr>
+      </table>
+    </div>
+
+    <div class="section-title">Note</div>
+    <div class="footer-notes">
+      <p style="margin: 0 0 10px 0;">Bagaglio in stiva kg <strong>${data.bagaglioStivaKg ?? 15}</strong> + kg <strong>${data.bagaglioManoKg ?? 7}</strong> a mano a passeggero.</p>
+      <p style="margin: 0;">La carta d'imbarco verrà inviata il mercoledì precedente la partenza.</p>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
 
