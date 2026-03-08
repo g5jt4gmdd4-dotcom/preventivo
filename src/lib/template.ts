@@ -272,7 +272,7 @@ export function generateHtml(res: QuoteResult): string {
 
     restaurantHtml = `
       <div style="margin-top: ${sectionMar}; margin-bottom: ${sectionMar};">
-        <table style="width: 100%; border-collapse: collapse; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; table-layout: fixed;">
+        <table style="width: 680px; max-width: 100%; border-collapse: collapse; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; table-layout: fixed;">
           <thead style="background-color: #f1f5f9;">
             <tr>
               <th style="padding: ${cellPad}; text-align: center; color: #000000; font-size: 10pt; text-transform: uppercase; font-family: Aptos, sans-serif; width: 25%;">Periodo</th>
@@ -392,7 +392,7 @@ export function generateHtml(res: QuoteResult): string {
 
         <!-- Cost Table -->
         <div style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; margin-bottom: 20px;">
-          <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
+          <table style="width: 680px; max-width: 100%; border-collapse: collapse; table-layout: fixed;">
             <thead>
               <tr style="background-color: #f1f5f9; border-bottom: 1px solid #e2e8f0;">
                 <th style="padding: 12px; text-align: center; color: #000000; font-size: 10pt; text-transform: uppercase; font-family: Aptos, Calibri, sans-serif; width: 25%;">Periodo</th>
@@ -479,7 +479,7 @@ export function generateHtml(res: QuoteResult): string {
       <!-- Seconda Tabella Ultra-Compatta (Ancorata al Fondo) -->
       <div style="margin-top: auto; border-top: 1px dashed #ccc; padding-top: 20px; flex-shrink: 0; padding-bottom: 10px;">
         <div style="font-size: 9pt; font-weight: bold; color: #666; margin-bottom: 8px; text-transform: uppercase;">Riepilogo Interno</div>
-        <table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb; font-size: 9pt;">
+        <table style="width: 680px; max-width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb; font-size: 9pt;">
           <thead>
             <tr style="background-color: #f8fafc; border-bottom: 2px solid #3b82f6;">
               <th style="padding: 3px 6px; text-align: center; border: 1px solid #e5e7eb; color: #1e3a8a; width: 25%;">Periodo</th>
@@ -515,7 +515,7 @@ export function generateHtml(res: QuoteResult): string {
 
     ${!isPage2 ? `
     <!-- Grand Total Section (Page 1 Only) -->
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#eff6ff" style="margin-bottom: ${sectionMar}; border-collapse: separate; border-spacing: 0; background-color: #eff6ff; border: 1px solid #dbeafe; border-radius: 8px;">
+    <table cellpadding="0" cellspacing="0" border="0" bgcolor="#eff6ff" style="width: 680px; max-width: 100%; margin-bottom: ${sectionMar}; border-collapse: separate; border-spacing: 0; background-color: #eff6ff; border: 1px solid #dbeafe; border-radius: 8px;">
       <tr>
         <td align="center" style="padding: ${sectionMar === '30px' ? '20px' : '12px'};">
           <table width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -605,7 +605,6 @@ export function generateHtml(res: QuoteResult): string {
         padding: ${densityScore > 22 ? '5mm 10mm' : '10mm 15mm'}; /* Dynamic padding for overflow */
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
         border-radius: 4px;
-        min-height: 297mm;
         box-sizing: border-box;
         border: 1px solid #e2e8f0;
         position: relative;
