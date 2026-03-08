@@ -178,19 +178,19 @@ export function generateHtml(res: QuoteResult): string {
       const rowBg = isEven ? '#f0f9ff' : '#ffffff';
       return `
       <tr style="background-color: ${rowBg}; border-bottom: 1px solid #e0f2fe;">
-        <td style="padding: ${cellPad}; text-align: center; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #334155;">
+        <td style="padding: ${cellPad}; text-align: center; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #000000;">
           ${row.periodStart} - ${row.periodEnd}
         </td>
-        <td style="padding: ${cellPad}; text-align: left; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #334155;">
+        <td style="padding: ${cellPad}; text-align: left; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #000000;">
           ${row.label}
         </td>
-        <td style="padding: ${cellPad}; text-align: center; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #334155;">
+        <td style="padding: ${cellPad}; text-align: center; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #000000;">
           ${row.quantity > 0 ? row.quantity : '-'}
         </td>
-        <td style="padding: ${cellPad}; text-align: right; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #334155;">
+        <td style="padding: ${cellPad}; text-align: right; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #000000;">
           € ${formatEuro(row.pricePerUnit)}
         </td>
-        <td style="padding: ${cellPad}; text-align: right; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #0f172a; font-weight: 600;">
+        <td style="padding: ${cellPad}; text-align: right; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #000000; font-weight: 600;">
           € ${formatEuro(row.total)}
         </td>
       </tr>
@@ -202,19 +202,19 @@ export function generateHtml(res: QuoteResult): string {
     const rowBg = isEven ? '#f0f9ff' : '#ffffff';
     return `
     <tr style="background-color: ${rowBg}; border-bottom: 1px solid #e0f2fe;">
-      <td style="padding: ${cellPad}; text-align: center; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #334155;">
+      <td style="padding: ${cellPad}; text-align: center; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #000000;">
         ${row.periodStart} - ${row.periodEnd}
       </td>
-      <td style="padding: ${cellPad}; text-align: left; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #334155;">
+      <td style="padding: ${cellPad}; text-align: left; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #000000;">
         ${row.label}
       </td>
-      <td style="padding: ${cellPad}; text-align: center; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #334155;">
+      <td style="padding: ${cellPad}; text-align: center; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #000000;">
         ${row.quantity}
       </td>
-      <td style="padding: ${cellPad}; text-align: right; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #334155;">
+      <td style="padding: ${cellPad}; text-align: right; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #000000;">
         -
       </td>
-      <td style="padding: ${cellPad}; text-align: right; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #0f172a; font-weight: 600;">
+      <td style="padding: ${cellPad}; text-align: right; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #000000; font-weight: 600;">
         € ${formatEuro(row.total)}
       </td>
     </tr>
@@ -228,19 +228,19 @@ export function generateHtml(res: QuoteResult): string {
       const rowBg = isEven ? '#f0f9ff' : '#ffffff';
       return `
       <tr style="background-color: ${rowBg}; border-bottom: 1px solid #e0f2fe;">
-        <td style="padding: ${cellPad}; text-align: center; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #334155;">
+        <td style="padding: ${cellPad}; text-align: center; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #000000;">
           ${row.periodStart || '-'} ${row.periodEnd ? `- ${row.periodEnd}` : ''}
         </td>
-        <td style="padding: ${cellPad}; text-align: left; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #334155;">
+        <td style="padding: ${cellPad}; text-align: left; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #000000;">
           ${row.label}
         </td>
-        <td style="padding: ${cellPad}; text-align: center; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #334155;">
+        <td style="padding: ${cellPad}; text-align: center; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #000000;">
           ${row.quantity > 0 ? row.quantity : '-'}
         </td>
-        <td style="padding: ${cellPad}; text-align: right; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #334155;">
+        <td style="padding: ${cellPad}; text-align: right; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #000000;">
           € ${formatEuro(row.pricePerUnit)}
         </td>
-        <td style="padding: ${cellPad}; text-align: right; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #0f172a; font-weight: 600;">
+        <td style="padding: ${cellPad}; text-align: right; font-family: Aptos, sans-serif; font-size: ${rowFS}; color: #000000; font-weight: 600;">
           € ${formatEuro(row.total)}
         </td>
       </tr>
@@ -255,16 +255,16 @@ export function generateHtml(res: QuoteResult): string {
       const rowBg = isEven ? '#f0f9ff' : '#ffffff'; // Same light blue
       return `
       <tr style="background-color: ${rowBg}; border-bottom: 1px solid #e0f2fe;">
-        <td style="padding: 12px; text-align: center; font-family: Aptos, sans-serif; font-size: 11pt; color: #334155;">
+        <td style="padding: 12px; text-align: center; font-family: Aptos, sans-serif; font-size: 11pt; color: #000000;">
           ${row.periodStart} - ${row.periodEnd}
         </td>
-        <td style="padding: 12px; text-align: left; font-family: Aptos, sans-serif; font-size: 11pt; color: #334155;">
+        <td style="padding: 12px; text-align: left; font-family: Aptos, sans-serif; font-size: 11pt; color: #000000;">
           ${row.label}
         </td>
-        <td style="padding: 12px; text-align: center; font-family: Aptos, sans-serif; font-size: 11pt; color: #334155;">
+        <td style="padding: 12px; text-align: center; font-family: Aptos, sans-serif; font-size: 11pt; color: #000000;">
           ${row.quantity}
         </td>
-        <td style="padding: 12px; text-align: right; font-family: Aptos, sans-serif; font-size: 11pt; color: #334155; font-weight: 600;">
+        <td style="padding: 12px; text-align: right; font-family: Aptos, sans-serif; font-size: 11pt; color: #000000; font-weight: 600;">
           € ${formatEuro(row.total)}
         </td>
       </tr>
@@ -275,10 +275,10 @@ export function generateHtml(res: QuoteResult): string {
         <table style="width: 100%; border-collapse: collapse; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; table-layout: fixed;">
           <thead style="background-color: #f1f5f9;">
             <tr>
-              <th style="padding: ${cellPad}; text-align: center; color: #475569; font-size: 10pt; text-transform: uppercase; font-family: Aptos, sans-serif; width: 25%;">Periodo</th>
-              <th style="padding: ${cellPad}; text-align: left; color: #475569; font-size: 10pt; text-transform: uppercase; font-family: Aptos, sans-serif; width: 55%;">Descrizione</th>
-              <th style="padding: ${cellPad}; text-align: center; color: #475569; font-size: 10pt; text-transform: uppercase; font-family: Aptos, sans-serif; width: 10%;">Pax/Gg</th>
-              <th style="padding: ${cellPad}; text-align: right; color: #475569; font-size: 10pt; text-transform: uppercase; font-family: Aptos, sans-serif; width: 10%;">Totale</th>
+              <th style="padding: ${cellPad}; text-align: center; color: #000000; font-size: 10pt; text-transform: uppercase; font-family: Aptos, sans-serif; width: 25%;">Periodo</th>
+              <th style="padding: ${cellPad}; text-align: left; color: #000000; font-size: 10pt; text-transform: uppercase; font-family: Aptos, sans-serif; width: 55%;">Descrizione</th>
+              <th style="padding: ${cellPad}; text-align: center; color: #000000; font-size: 10pt; text-transform: uppercase; font-family: Aptos, sans-serif; width: 10%;">Pax/Gg</th>
+              <th style="padding: ${cellPad}; text-align: right; color: #000000; font-size: 10pt; text-transform: uppercase; font-family: Aptos, sans-serif; width: 10%;">Totale</th>
             </tr>
           </thead>
           <tbody>
@@ -292,8 +292,8 @@ export function generateHtml(res: QuoteResult): string {
             </tr>
             ` : ''}
             <tr style="background-color: #f8fafc; border-top: 1px solid #e2e8f0;">
-              <td colspan="3" style="padding: ${cellPad}; text-align: right; color: #475569; font-family: Aptos, sans-serif; font-size: ${rowFS};">Totale Ristorante:</td>
-              <td style="padding: ${cellPad}; text-align: right; color: #0f172a; font-family: Aptos, sans-serif; font-size: ${fsTitle}; font-weight: bold;">€ ${formatEuro(res.restaurantGrandTotal)}</td>
+              <td colspan="3" style="padding: ${cellPad}; text-align: right; color: #000000; font-family: Aptos, sans-serif; font-size: ${rowFS};">Totale Ristorante:</td>
+              <td style="padding: ${cellPad}; text-align: right; color: #000000; font-family: Aptos, sans-serif; font-size: ${fsTitle}; font-weight: bold;">€ ${formatEuro(res.restaurantGrandTotal)}</td>
             </tr>
           </tfoot>
         </table>
@@ -327,7 +327,7 @@ export function generateHtml(res: QuoteResult): string {
     
     // Flight info block
     const flightInfoSideBlock = showFlightInfo ? `
-      <div style="text-align: left; font-size: ${fs}; line-height: 1.4; color: #334155;">
+      <div style="text-align: left; font-size: ${fs}; line-height: 1.4; color: #000000;">
         <strong>Arrivo:</strong> ${[res.flightCodeOut, res.accommodations[0]?.flightAirport, res.arrivalInfo].filter(Boolean).join(', ')}<br>
         <strong>Partenza:</strong> ${[res.flightCodeReturn, res.accommodations[0]?.flightAirport, res.departureInfo].filter(Boolean).join(', ')}
       </div>
@@ -340,11 +340,11 @@ export function generateHtml(res: QuoteResult): string {
         <!-- Logo and Company Info (Centered) -->
         <div style="text-align: center; margin-bottom: 5px;">
           <img src="${logoPath}" alt="Logo" style="display: block; margin: 0 auto 5px auto; max-height: 55px;">
-          <div style="font-size: 9pt; line-height: 1.3; color: #334155;">
+          <div style="font-size: 9pt; line-height: 1.3; color: #000000;">
             <strong>Villaggio La Roccia Camping</strong><br>
             C.da Madonna - 92031 Lampedusa<br>
             CIR: 19084020B101960 | CIN: IT08420B1B77QEMZ6<br>
-            <a href="https://www.laroccia.net" style="color: #334155; text-decoration: none;">www.laroccia.net</a>
+            <a href="https://www.laroccia.net" style="color: #000000; text-decoration: none;">www.laroccia.net</a>
           </div>
         </div>
 
@@ -395,11 +395,11 @@ export function generateHtml(res: QuoteResult): string {
           <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
             <thead>
               <tr style="background-color: #f1f5f9; border-bottom: 1px solid #e2e8f0;">
-                <th style="padding: 12px; text-align: center; color: #475569; font-size: 10pt; text-transform: uppercase; font-family: Aptos, Calibri, sans-serif; width: 25%;">Periodo</th>
-                <th style="padding: 12px; text-align: left; color: #475569; font-size: 10pt; text-transform: uppercase; font-family: Aptos, Calibri, sans-serif; width: 45%;">Descrizione</th>
-                <th style="padding: 12px; text-align: center; color: #475569; font-size: 10pt; text-transform: uppercase; font-family: Aptos, Calibri, sans-serif; width: 10%;">Pax/Gg</th>
-                <th style="padding: 12px; text-align: right; color: #475569; font-size: 10pt; text-transform: uppercase; font-family: Aptos, Calibri, sans-serif; width: 10%;">Prezzo</th>
-                <th style="padding: 12px; text-align: right; color: #475569; font-size: 10pt; text-transform: uppercase; font-family: Aptos, Calibri, sans-serif; width: 10%;">Totale</th>
+                <th style="padding: 12px; text-align: center; color: #000000; font-size: 10pt; text-transform: uppercase; font-family: Aptos, Calibri, sans-serif; width: 25%;">Periodo</th>
+                <th style="padding: 12px; text-align: left; color: #000000; font-size: 10pt; text-transform: uppercase; font-family: Aptos, Calibri, sans-serif; width: 45%;">Descrizione</th>
+                <th style="padding: 12px; text-align: center; color: #000000; font-size: 10pt; text-transform: uppercase; font-family: Aptos, Calibri, sans-serif; width: 10%;">Pax/Gg</th>
+                <th style="padding: 12px; text-align: right; color: #000000; font-size: 10pt; text-transform: uppercase; font-family: Aptos, Calibri, sans-serif; width: 10%;">Prezzo</th>
+                <th style="padding: 12px; text-align: right; color: #000000; font-size: 10pt; text-transform: uppercase; font-family: Aptos, Calibri, sans-serif; width: 10%;">Totale</th>
               </tr>
             </thead>
             <tbody>
@@ -414,8 +414,8 @@ export function generateHtml(res: QuoteResult): string {
             </tbody>
             <tfoot>
               <tr style="background-color: #f8fafc; border-top: 1px solid #e2e8f0;">
-                <td colspan="4" style="padding: 12px; text-align: right; font-size: 11pt; color: #475569; font-family: Aptos, Calibri, sans-serif;">Totale Parziale:</td>
-                <td style="padding: 12px; text-align: right; font-size: 12pt; font-weight: bold; color: #0f172a; font-family: Aptos, Calibri, sans-serif;">€ ${formatEuro(res.totalStay + (res.isConferma ? res.totalRestaurant : 0))}</td>
+                <td colspan="4" style="padding: 12px; text-align: right; font-size: 11pt; color: #000000; font-family: Aptos, Calibri, sans-serif;">Totale Parziale:</td>
+                <td style="padding: 12px; text-align: right; font-size: 12pt; font-weight: bold; color: #000000; font-family: Aptos, Calibri, sans-serif;">€ ${formatEuro(res.totalStay + (res.isConferma ? res.totalRestaurant : 0))}</td>
               </tr>
               ${res.discountAmount > 0 ? `
               <tr style="background-color: #f0fdf4;">
@@ -617,7 +617,7 @@ export function generateHtml(res: QuoteResult): string {
         bottom: 5mm; /* reduced */
         right: 10mm; /* reduced */
         font-size: 8pt;
-        color: #94a3b8;
+        color: #000000;
       }
       
       .page-break {
@@ -813,16 +813,16 @@ export function generateFlightModuleHtml(data: FlightModuleData): string {
               const rowBg = idx % 2 === 0 ? '#f0f9ff' : '#ffffff';
               return `
       <tr style="background-color: ${rowBg}; border-bottom: 1px solid #e0f2fe;">
-        <td style="padding: 12px; text-align: left; font-family: Aptos, Calibri, sans-serif; font-size: 10pt; color: #334155;">${p.cognome}</td>
-        <td style="padding: 12px; text-align: left; font-family: Aptos, Calibri, sans-serif; font-size: 10pt; color: #334155;">${p.nome}</td>
+        <td style="padding: 12px; text-align: left; font-family: Aptos, Calibri, sans-serif; font-size: 10pt; color: #000000;">${p.cognome}</td>
+        <td style="padding: 12px; text-align: left; font-family: Aptos, Calibri, sans-serif; font-size: 10pt; color: #000000;">${p.nome}</td>
       </tr>`;
             }
           )
           .join('')
       : `
       <tr style="background-color: #ffffff; border-bottom: 1px solid #e0f2fe;">
-        <td style="padding: 12px; height: 24px; font-family: Aptos, sans-serif; font-size: 10pt; color: #334155;"></td>
-        <td style="padding: 12px; font-family: Aptos, sans-serif; font-size: 10pt; color: #334155;"></td>
+        <td style="padding: 12px; height: 24px; font-family: Aptos, sans-serif; font-size: 10pt; color: #000000;"></td>
+        <td style="padding: 12px; font-family: Aptos, sans-serif; font-size: 10pt; color: #000000;"></td>
       </tr>`;
 
   const a = data.andata || { compagnia: '', tratta: '', data: '', orarioPartenza: '', orarioArrivo: '' };
@@ -838,22 +838,22 @@ export function generateFlightModuleHtml(data: FlightModuleData): string {
   <title>Modulo Operativo Trasporti</title>
   <style>
     @page { size: A4; margin: 15mm; }
-    body { font-family: 'Segoe UI', Aptos, Calibri, sans-serif; font-size: 11pt; margin: 0; padding: 15mm; color: #334155; background: #f8fafc; }
+    body { font-family: 'Segoe UI', Aptos, Calibri, sans-serif; font-size: 11pt; margin: 0; padding: 15mm; color: #000000; background: #f8fafc; }
     .page { width: 210mm; min-height: 297mm; box-sizing: border-box; background: #fff; padding: 18px; border-radius: 8px; }
     table { border-collapse: collapse; width: 100%; }
     .header-table { margin-bottom: 18px; }
-    .section-title { font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; font-size: 10pt; margin: 18px 0 10px 0; color: #475569; }
+    .section-title { font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; font-size: 10pt; margin: 18px 0 10px 0; color: #000000; }
     .operativo-block { margin-bottom: 20px; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: #f8fafc; }
-    .operativo-block .operativo-title { font-weight: 600; font-size: 10pt; color: #0f172a; padding: 10px 12px; background: #f1f5f9; border-bottom: 1px solid #e2e8f0; }
+    .operativo-block .operativo-title { font-weight: 600; font-size: 10pt; color: #000000; padding: 10px 12px; background: #f1f5f9; border-bottom: 1px solid #e2e8f0; }
     .operativo-block table { width: 100%; }
     .operativo-block td { padding: 8px 12px; font-size: 10pt; border: none; }
-    .operativo-block td:first-child { width: 26%; color: #64748b; font-weight: 500; }
-    .operativo-block td:last-child { color: #0f172a; }
+    .operativo-block td:first-child { width: 26%; color: #000000; font-weight: 500; }
+    .operativo-block td:last-child { color: #000000; }
     .operativo-block tr { border-bottom: 1px solid #e2e8f0; }
     .operativo-block tr:last-child { border-bottom: none; }
-    .footer-notes { font-size: 9pt; margin-top: 24px; line-height: 1.5; color: #64748b; padding: 14px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; }
-    .footer-notes strong { color: #475569; }
-    .pratica-line { font-size: 10pt; margin-bottom: 8px; color: #475569; }
+    .footer-notes { font-size: 9pt; margin-top: 24px; line-height: 1.5; color: #000000; padding: 14px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; }
+    .footer-notes strong { color: #000000; }
+    .pratica-line { font-size: 10pt; margin-bottom: 8px; color: #000000; }
     .modulo-title { font-size: 12pt; font-weight: 700; margin-bottom: 16px; text-align: center; color: #1e293b; letter-spacing: 0.02em; }
   </style>
 </head>
@@ -863,17 +863,17 @@ export function generateFlightModuleHtml(data: FlightModuleData): string {
       <tr>
         <td style="width: 50%; vertical-align: top; text-align: left; padding-right: 24px;">
           <img src="${logoPath}" alt="Villaggio La Roccia Camping" style="max-height: 78px; display: block; margin-bottom: 8px;" />
-          <div style="font-size: 9pt; line-height: 1.35; color: #334155;">
+          <div style="font-size: 9pt; line-height: 1.35; color: #000000;">
             <strong>Villaggio La Roccia Camping</strong><br />
             C.da Madonna - 92031 Lampedusa<br />
             CIR: 19084020B101960 | CIN: IT08420B1B77QEMZ6<br />
-            <a href="https://www.laroccia.net" style="color: #334155; text-decoration: none;">www.laroccia.net</a>
+            <a href="https://www.laroccia.net" style="color: #000000; text-decoration: none;">www.laroccia.net</a>
           </div>
         </td>
         <td style="width: 50%; vertical-align: top; padding-left: 24px;">
           <div style="text-align: right;">
             <img src="${efesoLogoPath}" alt="Efesovacanze" style="max-height: 78px; display: inline-block; margin-bottom: 8px; vertical-align: top;" />
-            <div style="font-size: 9pt; line-height: 1.35; color: #334155;">
+            <div style="font-size: 9pt; line-height: 1.35; color: #000000;">
               <strong>Efesovacanze.com</strong><br />
               Via Pirandello, 10<br />
               92031 - Lampedusa e Linosa (AG)<br />
@@ -893,8 +893,8 @@ export function generateFlightModuleHtml(data: FlightModuleData): string {
       <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
         <thead>
           <tr style="background-color: #f1f5f9; border-bottom: 1px solid #e2e8f0;">
-            <th style="padding: 12px; text-align: left; color: #475569; font-size: 10pt; text-transform: uppercase; font-family: Aptos, Calibri, sans-serif; width: 40%;">Cognome</th>
-            <th style="padding: 12px; text-align: left; color: #475569; font-size: 10pt; text-transform: uppercase; font-family: Aptos, Calibri, sans-serif; width: 60%;">Nome</th>
+            <th style="padding: 12px; text-align: left; color: #000000; font-size: 10pt; text-transform: uppercase; font-family: Aptos, Calibri, sans-serif; width: 40%;">Cognome</th>
+            <th style="padding: 12px; text-align: left; color: #000000; font-size: 10pt; text-transform: uppercase; font-family: Aptos, Calibri, sans-serif; width: 60%;">Nome</th>
           </tr>
         </thead>
         <tbody>${rowsHtml}</tbody>

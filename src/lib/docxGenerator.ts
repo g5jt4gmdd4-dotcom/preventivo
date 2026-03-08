@@ -176,9 +176,9 @@ export const generateDocx = async (res: QuoteResult): Promise<Blob> => {
                 new TableCell({
                   children: [new Paragraph({
                     children: [
-                        new TextRun({ text: arrivalText, font: "Aptos", size: fontSize - 2, color: "334155" }),
+                        new TextRun({ text: arrivalText, font: "Aptos", size: fontSize - 2, color: "000000" }),
                         new TextRun({ text: "", break: 1 }),
-                        new TextRun({ text: departureText, font: "Aptos", size: fontSize - 2, color: "334155" }),
+                        new TextRun({ text: departureText, font: "Aptos", size: fontSize - 2, color: "000000" }),
                     ],
                     alignment: AlignmentType.LEFT
                   })],
@@ -341,7 +341,7 @@ export const generateDocx = async (res: QuoteResult): Promise<Blob> => {
       }));
 
       targetChildren.push(new Paragraph({
-        children: [new TextRun({ text: "RIEPILOGO INTERNO (COPIA COMPATTA)", bold: true, font: "Aptos", size: fontSize - 2, color: "666666" })],
+        children: [new TextRun({ text: "RIEPILOGO INTERNO (COPIA COMPATTA)", bold: true, font: "Aptos", size: fontSize - 2, color: "000000" })],
         spacing: { after: 200 }
       }));
 
