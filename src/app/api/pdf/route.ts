@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import puppeteer, { Browser } from 'puppeteer-core';
 
-import chromium from '@sparticuz/chromium-min';
-import puppeteer from 'puppeteer-core';
-
-// Su Vercel la funzione può impiegare 20-40s (avvio Chromium + rendering). Serve maxDuration alto.
 export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
-  let browser: Awaited<ReturnType<typeof puppeteer.launch>> | null = null;
+  let browser: Browser | null = null;
 
   try {
     const { html, fileName } = await req.json();
@@ -16,46 +13,34 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'HTML content is required' }, { status: 400 });
     }
 
-    // Base tag per risolvere /logo.png e percorsi in sottocartella
     const origin = new URL(req.url).origin;
     const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
     const baseUrl = basePath ? `${origin}${basePath}` : origin;
     const htmlWithBase = html.replace('<head>', `<head><base href="${baseUrl}/">`);
 
     const isLocal = process.env.NODE_ENV === 'development';
-    let executablePath: string;
     
     if (isLocal) {
-      // Eseguibile Chrome predefinito su Windows
-      executablePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+      // In locale usa il Chrome preinstallato su Windows
+      browser = await puppeteer.launch({
+        executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        headless: true,
+      });
     } else {
-      // Usa pacchetto remoto per aggirare il limite Vercel 50MB e mancate dipendenze
-      executablePath = await chromium.executablePath(
-        'https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar'
-      );
+      // Su Vercel usa Browserless.io tramite WebSocket API
+      const API_KEY = process.env.BROWSERLESS_API_KEY;
+      if (!API_KEY) {
+         throw new Error('BROWSERLESS_API_KEY non configurata nelle variabili d\'ambiente di Vercel.');
+      }
+      browser = await puppeteer.connect({
+        browserWSEndpoint: `wss://chrome.browserless.io?token=${API_KEY}`,
+      });
     }
 
-    browser = await puppeteer.launch({
-      args: isLocal 
-        ? ['--no-sandbox', '--disable-setuid-sandbox'] 
-        : chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath,
-      headless: isLocal ? true : chromium.headless,
-    } as any);
-
     const page = await browser.newPage();
-
-    // Viewport A4 @ 96 DPI
     await page.setViewport({ width: 794, height: 1123 });
-
-    // 'load' è più veloce di networkidle0 e di solito basta per immagini/font; timeout evita blocchi
-    await page.setContent(htmlWithBase, {
-      waitUntil: 'load',
-      timeout: 20000,
-    });
-
-    // Breve attesa per eventuali immagini lazy
+    await page.setContent(htmlWithBase, { waitUntil: 'load', timeout: 20000 });
     await page.evaluate(() => new Promise((r) => setTimeout(r, 500)));
 
     const pdfBuffer = await page.pdf({
