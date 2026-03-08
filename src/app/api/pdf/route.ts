@@ -21,14 +21,24 @@ export async function POST(req: NextRequest) {
     const baseUrl = basePath ? `${origin}${basePath}` : origin;
     const htmlWithBase = html.replace('<head>', `<head><base href="${baseUrl}/">`);
 
-    const executablePath = await chromium.executablePath();
+    const isLocal = process.env.NODE_ENV === 'development';
+    let executablePath: string;
+    
+    if (isLocal) {
+      // Eseguibile Chrome predefinito su Windows
+      executablePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+    } else {
+      executablePath = await chromium.executablePath();
+    }
+
     browser = await puppeteer.launch({
-      args: [...chromium.args, '--disable-gpu', '--single-process', '--no-zygote', '--disable-dev-shm-usage'],
+      args: isLocal 
+        ? ['--no-sandbox', '--disable-setuid-sandbox'] 
+        : [...chromium.args, '--disable-gpu', '--single-process', '--no-zygote', '--disable-dev-shm-usage'],
       defaultViewport: chromium.defaultViewport,
       executablePath,
-      headless: chromium.headless,
-      ignoreHTTPSErrors: true,
-    });
+      headless: isLocal ? true : chromium.headless,
+    } as any);
 
     const page = await browser.newPage();
 
