@@ -1,4 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+
+// Workaround per Vercel Node 20: Sparticuz ha bisogno di sapere il runtime per caricare i binari corretti (inclusa libnss3.so)
+if (!process.env.AWS_LAMBDA_JS_RUNTIME) {
+  process.env.AWS_LAMBDA_JS_RUNTIME = 'nodejs20.x';
+}
+
 import chromium from '@sparticuz/chromium';
 import puppeteer from 'puppeteer-core';
 
