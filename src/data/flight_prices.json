@@ -1,0 +1,234 @@
+{
+  "weeks": [
+    "31/05 - 07/06",
+    "07/06 - 14/06",
+    "14/06 - 21/06",
+    "21/06 - 28/06",
+    "28/06 - 05/07",
+    "05/07 - 12/07",
+    "12/07 - 19/07",
+    "19/07 - 26/07",
+    "26/07 - 02/08",
+    "02/08 - 09/08",
+    "09/08 - 16/08",
+    "16/08 - 23/08",
+    "23/08 - 30/08",
+    "30/08 - 06/09",
+    "06/09 - 13/09",
+    "13/09 - 20/09",
+    "20/09 - 27/09",
+    "27/09 - 04/10",
+    "04/10 - 11/10"
+  ],
+  "prices": [
+    {
+      "period": "31/05 - 07/06",
+      "prices": {
+        "Bilo 4p Super": 570,
+        "Bilo 4p": 552.5,
+        "Mono 3p": 570,
+        "Mono 2p": 587.5,
+        "Chalet 2+1": 500,
+        "Bungalow 2p": 622.5
+      }
+    },
+    {
+      "period": "07/06 - 14/06",
+      "prices": {
+        "Bilo 4p Super": 580,
+        "Bilo 4p": 562.5,
+        "Mono 3p": 580,
+        "Mono 2p": 597.5,
+        "Chalet 2+1": 510,
+        "Bungalow 2p": 632.5
+      }
+    },
+    {
+      "period": "14/06 - 21/06",
+      "prices": {
+        "Bilo 4p Super": 597.5,
+        "Bilo 4p": 580,
+        "Mono 3p": 603.33,
+        "Mono 2p": 632.5,
+        "Chalet 2+1": 533.33,
+        "Bungalow 2p": 667.5
+      }
+    },
+    {
+      "period": "21/06 - 28/06",
+      "prices": {
+        "Bilo 4p Super": 607.5,
+        "Bilo 4p": 590,
+        "Mono 3p": 613.33,
+        "Mono 2p": 642.5,
+        "Chalet 2+1": 543.33,
+        "Bungalow 2p": 677.5
+      }
+    },
+    {
+      "period": "28/06 - 05/07",
+      "prices": {
+        "Bilo 4p Super": 625,
+        "Bilo 4p": 607.5,
+        "Mono 3p": 636.67,
+        "Mono 2p": 582.5,
+        "Chalet 2+1": 566.67,
+        "Bungalow 2p": 712.5
+      }
+    },
+    {
+      "period": "05/07 - 12/07",
+      "prices": {
+        "Bilo 4p Super": 625,
+        "Bilo 4p": 607.5,
+        "Mono 3p": 636.67,
+        "Mono 2p": 677.5,
+        "Chalet 2+1": 566.67,
+        "Bungalow 2p": 712.5
+      }
+    },
+    {
+      "period": "12/07 - 19/07",
+      "prices": {
+        "Bilo 4p Super": 625,
+        "Bilo 4p": 607.5,
+        "Mono 3p": 636.67,
+        "Mono 2p": 677.5,
+        "Chalet 2+1": 566.67,
+        "Bungalow 2p": 712.5
+      }
+    },
+    {
+      "period": "19/07 - 26/07",
+      "prices": {
+        "Bilo 4p Super": 668.75,
+        "Bilo 4p": 651.25,
+        "Mono 3p": 671.67,
+        "Mono 2p": 712.5,
+        "Chalet 2+1": 590,
+        "Bungalow 2p": 747.5
+      }
+    },
+    {
+      "period": "26/07 - 02/08",
+      "prices": {
+        "Bilo 4p Super": 668.75,
+        "Bilo 4p": 651.25,
+        "Mono 3p": 671.67,
+        "Mono 2p": 712.5,
+        "Chalet 2+1": 590,
+        "Bungalow 2p": 747.5
+      }
+    },
+    {
+      "period": "02/08 - 09/08",
+      "prices": {
+        "Bilo 4p Super": 683.75,
+        "Bilo 4p": 666.25,
+        "Mono 3p": 686.67,
+        "Mono 2p": 727.5,
+        "Chalet 2+1": 605,
+        "Bungalow 2p": 762.5
+      }
+    },
+    {
+      "period": "09/08 - 16/08",
+      "prices": {
+        "Bilo 4p Super": 683.75,
+        "Bilo 4p": 666.25,
+        "Mono 3p": 686.67,
+        "Mono 2p": 727.5,
+        "Chalet 2+1": 605,
+        "Bungalow 2p": 762.5
+      }
+    },
+    {
+      "period": "16/08 - 23/08",
+      "prices": {
+        "Bilo 4p Super": 683.75,
+        "Bilo 4p": 666.25,
+        "Mono 3p": 686.67,
+        "Mono 2p": 727.5,
+        "Chalet 2+1": 605,
+        "Bungalow 2p": 762.5
+      }
+    },
+    {
+      "period": "23/08 - 30/08",
+      "prices": {
+        "Bilo 4p Super": 666.25,
+        "Bilo 4p": 640,
+        "Mono 3p": 651.67,
+        "Mono 2p": 710,
+        "Chalet 2+1": 581.67,
+        "Bungalow 2p": 745
+      }
+    },
+    {
+      "period": "30/08 - 06/09",
+      "prices": {
+        "Bilo 4p Super": 651.25,
+        "Bilo 4p": 625,
+        "Mono 3p": 636.67,
+        "Mono 2p": 695,
+        "Chalet 2+1": 566.67,
+        "Bungalow 2p": 730
+      }
+    },
+    {
+      "period": "06/09 - 13/09",
+      "prices": {
+        "Bilo 4p Super": 625,
+        "Bilo 4p": 607.5,
+        "Mono 3p": 613.33,
+        "Mono 2p": 660,
+        "Chalet 2+1": 543.33,
+        "Bungalow 2p": 695
+      }
+    },
+    {
+      "period": "13/09 - 20/09",
+      "prices": {
+        "Bilo 4p Super": 615,
+        "Bilo 4p": 597.5,
+        "Mono 3p": 603.33,
+        "Mono 2p": 650,
+        "Chalet 2+1": 533.33,
+        "Bungalow 2p": 685
+      }
+    },
+    {
+      "period": "20/09 - 27/09",
+      "prices": {
+        "Bilo 4p Super": 615,
+        "Bilo 4p": 597.5,
+        "Mono 3p": 603.33,
+        "Mono 2p": 650,
+        "Chalet 2+1": 533.33,
+        "Bungalow 2p": 685
+      }
+    },
+    {
+      "period": "27/09 - 04/10",
+      "prices": {
+        "Bilo 4p Super": 597.5,
+        "Bilo 4p": 580,
+        "Mono 3p": 580,
+        "Mono 2p": 597.5,
+        "Chalet 2+1": 510,
+        "Bungalow 2p": 632.5
+      }
+    },
+    {
+      "period": "04/10 - 11/10",
+      "prices": {
+        "Bilo 4p Super": 597.5,
+        "Bilo 4p": 580,
+        "Mono 3p": 580,
+        "Mono 2p": 597.5,
+        "Chalet 2+1": 510,
+        "Bungalow 2p": 632.5
+      }
+    }
+  ]
+}

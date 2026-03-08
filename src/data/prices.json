@@ -1,0 +1,17 @@
+{
+  "ranges": [
+    { "start": "01/01", "end": "09/05", "prices": { "Bilo 4p Super": 100, "Bilo 4p": 100, "Mono 3p": 75, "Mono 2p": 60, "Chalet 2+1": 55, "Bungalow 2p": 60 } },
+    { "start": "09/05", "end": "13/06", "prices": { "Bilo 4p Super": 120, "Bilo 4p": 110, "Mono 3p": 90, "Mono 2p": 65, "Chalet 2+1": 60, "Bungalow 2p": 75 } },
+    { "start": "13/06", "end": "27/06", "prices": { "Bilo 4p Super": 130, "Bilo 4p": 120, "Mono 3p": 100, "Mono 2p": 75, "Chalet 2+1": 70, "Bungalow 2p": 85 } },
+    { "start": "27/06", "end": "18/07", "prices": { "Bilo 4p Super": 140, "Bilo 4p": 130, "Mono 3p": 110, "Mono 2p": 85, "Chalet 2+1": 80, "Bungalow 2p": 95 } },
+    { "start": "18/07", "end": "22/08", "prices": { "Bilo 4p Super": 165, "Bilo 4p": 155, "Mono 3p": 125, "Mono 2p": 95, "Chalet 2+1": 90, "Bungalow 2p": 105 } },
+    { "start": "22/08", "end": "05/09", "prices": { "Bilo 4p Super": 155, "Bilo 4p": 140, "Mono 3p": 110, "Mono 2p": 90, "Chalet 2+1": 80, "Bungalow 2p": 100 } },
+    { "start": "05/09", "end": "26/09", "prices": { "Bilo 4p Super": 140, "Bilo 4p": 130, "Mono 3p": 100, "Mono 2p": 80, "Chalet 2+1": 70, "Bungalow 2p": 90 } },
+    { "start": "26/09", "end": "10/10", "prices": { "Bilo 4p Super": 130, "Bilo 4p": 120, "Mono 3p": 90, "Mono 2p": 65, "Chalet 2+1": 60, "Bungalow 2p": 75 } },
+    { "start": "10/10", "end": "31/12", "prices": { "Bilo 4p Super": 110, "Bilo 4p": 110, "Mono 3p": 75, "Mono 2p": 60, "Chalet 2+1": 55, "Bungalow 2p": 70 } }
+  ],
+  "extra": {
+    "transfer": 10,
+    "forfait": 15
+  }
+}
