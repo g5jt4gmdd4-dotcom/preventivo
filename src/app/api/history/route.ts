@@ -10,21 +10,24 @@ function logDbError(context: string, error: unknown): void {
   if (hasTable) console.error('[history] Tabella mancante o schema non inizializzato.');
 }
 
-async function initDb() {
-  await sql`
-    CREATE TABLE IF NOT EXISTS quotes (
-      client_name TEXT PRIMARY KEY,
-      data JSONB NOT NULL,
-      status TEXT DEFAULT 'preventivo',
-      updated_at TIMESTAMP DEFAULT NOW()
-    );
-  `;
-  
-  // Aggiungi la colonna 'status' se la tabella esiste già ma non la ha
+async function initDb(): Promise<void> {
   try {
-    await sql`ALTER TABLE quotes ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'preventivo';`;
+    await sql`
+      CREATE TABLE IF NOT EXISTS quotes (
+        client_name TEXT PRIMARY KEY,
+        data JSONB NOT NULL,
+        status TEXT DEFAULT 'preventivo',
+        updated_at TIMESTAMP DEFAULT NOW()
+      );
+    `;
+    try {
+      await sql`ALTER TABLE quotes ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'preventivo';`;
+    } catch (e) {
+      // Colonna già presente o errore minore
+    }
   } catch (e) {
-    // Ignora errore se la colonna esiste già od errore sintassi minore
+    console.error('[history/initDb] Fallito init tabella:', e instanceof Error ? e.message : String(e));
+    throw e;
   }
 }
 
@@ -54,44 +57,67 @@ export async function POST(request: Request) {
 }
 
 export async function GET(request: Request) {
+  const hasPostgresEnv = !!(
+    process.env.POSTGRES_URL ||
+    process.env.DATABASE_URL ||
+    (process.env as Record<string, string>).POSTGRES_PRISMA_URL
+  );
+  console.log('[history/GET] Richiesta ricevuta. Env DB presente:', hasPostgresEnv);
+
   try {
     await initDb();
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status') || 'preventivo';
-    const mode = searchParams.get('mode');
+    const statusParam = searchParams.get('status') || 'preventivo';
+    const modeParam = searchParams.get('mode');
 
-    let rows;
-    if (mode === 'stay') {
+    // status='all' → tutti i record, nessun filtro mode. Record senza mode (vecchi dati) inclusi.
+    const statusFilter = statusParam === 'all';
+    let rows: { client_name: string; data: unknown; status: string; updated_at: string }[];
+
+    if (statusFilter) {
+      // Nessun filtro per status né per mode: restituisci tutto
       const result = await sql`
-        SELECT client_name, data, status, updated_at 
-        FROM quotes 
-        WHERE (${status} = 'all' OR status = ${status})
+        SELECT client_name, data, status, updated_at
+        FROM quotes
+        ORDER BY updated_at DESC
+        LIMIT 100;
+      `;
+      rows = result.rows as typeof rows;
+      console.log('[history/GET] Query "all", righe:', rows.length);
+    } else if (modeParam === 'stay') {
+      const result = await sql`
+        SELECT client_name, data, status, updated_at
+        FROM quotes
+        WHERE status = ${statusParam}
         AND (data->>'mode' = 'stay' OR data->>'mode' IS NULL)
         ORDER BY updated_at DESC
         LIMIT 100;
       `;
-      rows = result.rows;
-    } else if (mode === 'flight') {
+      rows = result.rows as typeof rows;
+      console.log('[history/GET] Query stay (inclusi senza mode), righe:', rows.length);
+    } else if (modeParam === 'flight') {
       const result = await sql`
-        SELECT client_name, data, status, updated_at 
-        FROM quotes 
-        WHERE (${status} = 'all' OR status = ${status})
+        SELECT client_name, data, status, updated_at
+        FROM quotes
+        WHERE status = ${statusParam}
         AND data->>'mode' = 'flight'
         ORDER BY updated_at DESC
         LIMIT 100;
       `;
-      rows = result.rows;
+      rows = result.rows as typeof rows;
+      console.log('[history/GET] Query flight, righe:', rows.length);
     } else {
       const result = await sql`
-        SELECT client_name, data, status, updated_at 
-        FROM quotes 
-        WHERE (${status} = 'all' OR status = ${status})
+        SELECT client_name, data, status, updated_at
+        FROM quotes
+        WHERE status = ${statusParam}
         ORDER BY updated_at DESC
         LIMIT 100;
       `;
-      rows = result.rows;
+      rows = result.rows as typeof rows;
+      console.log('[history/GET] Query default, righe:', rows.length);
     }
-    
+
     return NextResponse.json(rows);
   } catch (error: unknown) {
     logDbError('GET', error);

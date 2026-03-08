@@ -202,29 +202,27 @@ export default function Home() {
     }
 
     if (data.mode) setMode(data.mode);
-    setTimeout(() => {
-      const names = entry.client_name.split(' ');
-      setCustomerFirstName(names[0] || '');
-      setCustomerLastName(names.slice(1).join(' ') || '');
-      if (data.contactEmail !== undefined) setContactEmail(data.contactEmail);
-      if (data.contactPhone !== undefined) setContactPhone(data.contactPhone);
-      if (data.arrivalInfo !== undefined) setArrivalInfo(data.arrivalInfo);
-      if (data.departureInfo !== undefined) setDepartureInfo(data.departureInfo);
-      if (data.flightCodeOut !== undefined) setFlightCodeOut(data.flightCodeOut);
-      if (data.flightCodeReturn !== undefined) setFlightCodeReturn(data.flightCodeReturn);
-      if (data.accommodations) setAccommodations(data.accommodations);
-      if (data.totalPax !== undefined) setTotalPax(data.totalPax);
-      if (data.includeTransfer !== undefined) setIncludeTransfer(data.includeTransfer);
-      if (data.includeForfait !== undefined) setIncludeForfait(data.includeForfait);
-      if (data.payNowDiscount !== undefined) setPayNowDiscount(data.payNowDiscount);
-      if (data.discount) setDiscount(data.discount);
-      if (data.restaurantEnabled !== undefined) setRestaurantEnabled(data.restaurantEnabled);
-      if (data.restaurantRequests) setRestaurantRequests(data.restaurantRequests);
-      if (data.restaurantDiscount) setRestaurantDiscount(data.restaurantDiscount);
-      if (data.flightRequest) setFlightRequest(data.flightRequest);
-      if (data.useEfesoIban !== undefined) setUseEfesoIban(data.useEfesoIban);
-      setActiveTab('preview');
-    }, 0);
+    const names = entry.client_name.split(' ');
+    setCustomerFirstName(names[0] || '');
+    setCustomerLastName(names.slice(1).join(' ') || '');
+    if (data.contactEmail !== undefined) setContactEmail(data.contactEmail);
+    if (data.contactPhone !== undefined) setContactPhone(data.contactPhone);
+    if (data.arrivalInfo !== undefined) setArrivalInfo(data.arrivalInfo);
+    if (data.departureInfo !== undefined) setDepartureInfo(data.departureInfo);
+    if (data.flightCodeOut !== undefined) setFlightCodeOut(data.flightCodeOut);
+    if (data.flightCodeReturn !== undefined) setFlightCodeReturn(data.flightCodeReturn);
+    if (data.accommodations) setAccommodations(data.accommodations);
+    if (data.totalPax !== undefined) setTotalPax(data.totalPax);
+    if (data.includeTransfer !== undefined) setIncludeTransfer(data.includeTransfer);
+    if (data.includeForfait !== undefined) setIncludeForfait(data.includeForfait);
+    if (data.payNowDiscount !== undefined) setPayNowDiscount(data.payNowDiscount);
+    if (data.discount) setDiscount(data.discount);
+    if (data.restaurantEnabled !== undefined) setRestaurantEnabled(data.restaurantEnabled);
+    if (data.restaurantRequests) setRestaurantRequests(data.restaurantRequests);
+    if (data.restaurantDiscount) setRestaurantDiscount(data.restaurantDiscount);
+    if (data.flightRequest) setFlightRequest(data.flightRequest);
+    if (data.useEfesoIban !== undefined) setUseEfesoIban(data.useEfesoIban);
+    setActiveTab('preview');
   };
 
   // --- Handlers ---
@@ -706,7 +704,7 @@ export default function Home() {
                 </div>
               </div>
               <div className="p-6 border-t border-slate-200 bg-slate-50">
-                <h3 className="text-lg font-bold text-slate-800 flex items-center mb-4"><RotateCcw className="w-4 h-4 mr-2 text-sky-600" /> Storico conferme volo</h3>
+                <h3 className="text-lg font-bold text-slate-800 flex items-center mb-4"><RotateCcw className="w-4 h-4 mr-2 text-sky-600" /> Storico Voli</h3>
                 {loadingHistory ? <div className="text-slate-500 text-sm">Caricamento...</div> : history.length === 0 ? <div className="text-slate-500 text-sm">Nessuna conferma volo. Carica da Conferme (Volo + Soggiorno) per vederla qui.</div> : (
                   <div className="bg-white border border-slate-200 rounded-lg overflow-hidden max-h-[280px] overflow-y-auto">
                     <table className="w-full text-left text-sm text-slate-700">
@@ -718,7 +716,7 @@ export default function Home() {
                           <tr key={entry.client_name} className="border-b border-slate-100 bg-emerald-50/50 hover:bg-emerald-100">
                             <td className="px-4 py-2 font-bold text-slate-800 truncate max-w-[200px]">
                               <div className="flex items-center gap-2">
-                                {entry.data?.mode === 'flight' && <Plane className="w-3.5 h-3.5 text-blue-500 shrink-0 mr-1.5" />}
+                                {entry.data?.mode === 'flight' && <Plane size={14} className="text-blue-500 shrink-0 mr-1.5" />}
                                 {entry.client_name}
                               </div>
                             </td>
@@ -1928,7 +1926,7 @@ export default function Home() {
         <div className="p-6 border-t border-slate-200 bg-slate-50">
               <h3 className="text-lg font-bold text-slate-800 flex items-center mb-4">
                 <RotateCcw className="w-4 h-4 mr-2 text-blue-600" />
-                Storico {mainTab === 'conferme' ? `Preventivi (${mode === 'stay' ? 'Solo Soggiorno' : 'Volo + Soggiorno'})` : 'Preventivi'}
+                {mainTab === 'preventivi' ? 'Storico Preventivi' : mainTab === 'conferme' ? 'Storico Conferme' : 'Storico Voli'}
               </h3>
               {loadingHistory ? (
                 <div className="text-slate-500 text-sm">Caricamento storico...</div>
@@ -1957,7 +1955,7 @@ export default function Home() {
                             <td className="px-4 py-2 font-bold text-slate-800 truncate max-w-[150px]" title={entry.client_name}>
                               <div className="flex items-center gap-2">
                                 {entry.status === 'conferma' && <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-sm shrink-0"></span>}
-                                {entry.data?.mode === 'flight' && <Plane className="w-3.5 h-3.5 text-blue-500 shrink-0 mr-1.5" />}
+                                {entry.data?.mode === 'flight' && <Plane size={14} className="text-blue-500 shrink-0 mr-1.5" />}
                                 {entry.client_name}
                               </div>
                             </td>
