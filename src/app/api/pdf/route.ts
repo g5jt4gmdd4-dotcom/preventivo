@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import chromium from '@sparticuz/chromium';
 import puppeteer from 'puppeteer-core';
 
+// Su Vercel la funzione può impiegare 20-40s (avvio Chromium + rendering). Serve maxDuration alto.
+export const maxDuration = 60;
+
 export async function POST(req: NextRequest) {
+  let browser: Awaited<ReturnType<typeof puppeteer.launch>> | null = null;
+
   try {
     const { html, fileName } = await req.json();
 
@@ -10,52 +15,61 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'HTML content is required' }, { status: 400 });
     }
 
-    // Add base tag so /logo.png and subfolder paths resolve correctly
+    // Base tag per risolvere /logo.png e percorsi in sottocartella
     const origin = new URL(req.url).origin;
     const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
     const baseUrl = basePath ? `${origin}${basePath}` : origin;
     const htmlWithBase = html.replace('<head>', `<head><base href="${baseUrl}/">`);
 
     const executablePath = await chromium.executablePath();
-    const browser = await puppeteer.launch({
-      args: chromium.args,
+    browser = await puppeteer.launch({
+      args: [...chromium.args, '--disable-gpu', '--single-process', '--no-zygote', '--disable-dev-shm-usage'],
       defaultViewport: chromium.defaultViewport,
       executablePath,
       headless: chromium.headless,
+      ignoreHTTPSErrors: true,
     });
 
     const page = await browser.newPage();
-    
-    // Set viewport to A4 size at 96 DPI
+
+    // Viewport A4 @ 96 DPI
     await page.setViewport({ width: 794, height: 1123 });
-    
-    // Set content and wait for images/fonts to load
-    await page.setContent(htmlWithBase, { waitUntil: 'networkidle0' });
+
+    // 'load' è più veloce di networkidle0 e di solito basta per immagini/font; timeout evita blocchi
+    await page.setContent(htmlWithBase, {
+      waitUntil: 'load',
+      timeout: 20000,
+    });
+
+    // Breve attesa per eventuali immagini lazy
+    await page.evaluate(() => new Promise((r) => setTimeout(r, 500)));
 
     const pdfBuffer = await page.pdf({
       format: 'A4',
       printBackground: true,
-      margin: {
-        top: '0px',
-        right: '0px',
-        bottom: '0px',
-        left: '0px'
-      },
+      margin: { top: '0px', right: '0px', bottom: '0px', left: '0px' },
       displayHeaderFooter: false,
-      preferCSSPageSize: true
+      preferCSSPageSize: true,
+      timeout: 30000,
     });
 
-    await browser.close();
-
-    return new NextResponse(pdfBuffer as any, {
+    return new NextResponse(pdfBuffer as unknown as BodyInit, {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="${fileName || 'document.pdf'}"`,
       },
     });
-  } catch (error: any) {
-    console.error('PDF Generation Error:', error);
-    return NextResponse.json({ error: 'Failed to generate PDF', details: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error('PDF Generation Error:', message);
+    return NextResponse.json(
+      { error: 'Failed to generate PDF', details: message },
+      { status: 500 }
+    );
+  } finally {
+    if (browser) {
+      await browser.close().catch((e) => console.error('Browser close error:', e));
+    }
   }
 }

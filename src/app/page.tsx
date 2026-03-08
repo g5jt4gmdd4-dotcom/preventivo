@@ -699,7 +699,7 @@ export default function Home() {
                     <span className="text-xs font-bold text-slate-600 uppercase">Anteprima modulo</span>
                   </div>
                   <div className="flex-1 overflow-auto p-4">
-                    <iframe srcDoc={flightModuleHtml} title="Anteprima modulo volo" className="w-full min-h-[800px] border border-slate-200 rounded-lg bg-white shadow-inner" />
+                    <iframe id="print-area-volo" srcDoc={flightModuleHtml} title="Anteprima modulo volo" className="w-full min-h-[800px] border border-slate-200 rounded-lg bg-white shadow-inner" />
                   </div>
                 </div>
               </div>
@@ -777,7 +777,12 @@ export default function Home() {
                       }
                     } catch (error) {
                       console.error('Error saving PDF:', error);
-                      alert('Errore durante la generazione del PDF.');
+                      alert('Errore durante la generazione del PDF. Si aprirà la finestra di stampa: scegli "Salva come PDF" come destinazione.');
+                      const iframe = document.getElementById('print-area-volo') as HTMLIFrameElement | null;
+                      if (iframe?.contentWindow) {
+                        iframe.contentWindow.focus();
+                        iframe.contentWindow.print();
+                      }
                     }
                   }}
                   className="bg-purple-600 hover:bg-purple-700 text-white w-14 h-14 rounded-full shadow-2xl shadow-purple-600/30 flex items-center justify-center transform hover:scale-110 transition-all group"
@@ -1893,7 +1898,12 @@ export default function Home() {
                           }
                         } catch (error) {
                           console.error('Error saving PDF:', error);
-                          alert('Errore durante la generazione del PDF. Prova a usare il tasto Stampa.');
+                          alert('Errore durante la generazione del PDF. Si aprirà la finestra di stampa: scegli "Salva come PDF" come destinazione.');
+                          const iframe = document.getElementById('print-area') as HTMLIFrameElement | null;
+                          if (iframe?.contentWindow) {
+                            iframe.contentWindow.focus();
+                            iframe.contentWindow.print();
+                          }
                         }
                       }}
                       className="bg-purple-600 hover:bg-purple-700 text-white w-14 h-14 rounded-full shadow-2xl shadow-purple-600/30 flex items-center justify-center transform hover:scale-110 transition-all group"
