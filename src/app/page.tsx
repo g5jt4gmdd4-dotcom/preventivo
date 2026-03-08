@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { calculateQuote, calculateFlightQuote, AccommodationRequest, DiscountInfo, RestaurantRequest, FlightRequest, formatEuro } from '@/lib/calculator';
 import { generateHtml, generatePlainText, generateFlightModuleHtml, type FlightModuleData, type FlightOperativo } from '@/lib/template';
-import { Copy, FileText, Code, Eye, Plus, Trash2, Tag, Euro, Utensils, Home as HomeIcon, Plane, Users, RotateCcw, FileCheck, Printer, FileDown } from 'lucide-react';
+import { Copy, FileText, Code, Eye, Plus, Trash2, Tag, Euro, Utensils, Home as HomeIcon, Plane, Users, RotateCcw, FileCheck, Printer, FileDown, LogOut } from 'lucide-react';
 import { saveAs } from 'file-saver';
 import { generateDocx } from '@/lib/docxGenerator';
 import flightPricesData from '@/data/flight_prices.json';
@@ -623,6 +623,19 @@ export default function Home() {
             Volo
           </button>
         </nav>
+        <div className="w-full p-2 mt-auto mb-4">
+          <button
+            onClick={async () => {
+              await fetch('/api/auth/logout', { method: 'POST' });
+              window.location.href = '/login';
+            }}
+            className="w-full flex flex-col items-center justify-center gap-1 p-3 rounded-xl text-[10px] font-bold uppercase text-slate-400 hover:bg-red-500/20 hover:text-red-400 transition-all"
+            title="Disconnetti dal sistema"
+          >
+            <LogOut className="w-6 h-6 mb-1" />
+            Esci
+          </button>
+        </div>
       </aside>
 
       {/* Main Content */}
