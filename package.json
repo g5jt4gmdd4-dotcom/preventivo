@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@sparticuz/chromium": "^131.0.1",
     "@vercel/postgres": "^0.10.0",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
@@ -18,7 +19,7 @@
     "html2pdf.js": "^0.14.0",
     "lucide-react": "^0.378.0",
     "next": "14.2.3",
-    "puppeteer": "^24.38.0",
+    "puppeteer-core": "^23.11.1",
     "react": "^18",
     "react-dom": "^18",
     "tailwind-merge": "^2.3.0",
