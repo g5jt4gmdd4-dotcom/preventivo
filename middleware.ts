@@ -8,39 +8,51 @@ const publicPaths = ['/login', '/api/auth', '/logo.png', '/favicon.ico'];
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Esclusioni: Pagine pubbliche e file statici (CSS, Immagini)
+  // 1. Esclusioni Statiche: Pagine pubbliche e file di sistema (Next.js internals, immagini)
   if (
     publicPaths.some((p) => pathname.startsWith(p)) ||
-    pathname.startsWith('/_next')
+    pathname.startsWith('/_next') ||
+    pathname.includes('favicon.ico')
   ) {
     return NextResponse.next();
   }
 
+  // 2. Controllo del Token
   const token = req.cookies.get('auth_token')?.value;
 
   if (!token) {
-    // Nessun token: reindirizza al login
-    return NextResponse.redirect(new URL('/login', req.url));
+    // 3A. Nessun token: reindirizza al login
+    const loginUrl = new URL('/login', req.url);
+    const response = NextResponse.redirect(loginUrl);
+    
+    // Header che forza il browser a NON usare cache per queste pagine protette
+    response.headers.set('Cache-Control', 'no-store, max-age=0');
+    return response;
   }
 
+  // 3B. Token presente: verifica crittografica
   try {
     const secret = new TextEncoder().encode(
       process.env.JWT_SECRET || 'fallback_secret_must_be_changed_in_prod_12345'
     );
-    // Verifica la validità e la firma del Token
     await jwtVerify(token, secret);
     
-    // Token ok, prosegui
-    return NextResponse.next();
+    // Token ok, passa la richiesta aggiungendo header anti-cache sulle pagine protette 
+    const response = NextResponse.next();
+    response.headers.set('Cache-Control', 'no-store, max-age=0');
+    return response;
   } catch (err) {
-    // Token scaduto o manomesso: caccia l'utente al login e digli di rimettere la pwd
-    const response = NextResponse.redirect(new URL('/login', req.url));
+    // 3C. Token alterato o scaduto: caccia l'utente al login rimuovendo il cookie fantasma
+    const loginUrl = new URL('/login', req.url);
+    const response = NextResponse.redirect(loginUrl);
     response.cookies.delete('auth_token');
+    response.headers.set('Cache-Control', 'no-store, max-age=0');
     return response;
   }
 }
 
+// Intercettiamo TUTTO tranne le cartelle statiche base base, 
+// la logica vera e propria ora la controlla l'If dentro la funzione principale (che è garantito funzionare al 100%)
 export const config = {
-  // Il middleware si attiverà per tutte le pagine eccetto alcuni pattern interni
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  matcher: '/:path*',
 };
