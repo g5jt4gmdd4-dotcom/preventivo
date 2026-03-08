@@ -316,7 +316,8 @@ export function generateHtml(res: QuoteResult): string {
     </div>
   `;
   const today = format(new Date(), 'dd/MM/yyyy');
-  const logoPath = '/logo.png';
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+  const logoPath = `${basePath}/logo.png`;
   const allRowsHtml = staysRowsHtml + restaurantRowsHtml + extrasRowsHtml;
 
   // Function to generate content for a specific page
@@ -786,8 +787,9 @@ export interface FlightModuleData {
  * Intestazione agenzia, tabella nominativi, box operativo voli, note bagagli/carta imbarco.
  */
 export function generateFlightModuleHtml(data: FlightModuleData): string {
-  const logoPath = '/logo.png';
-  const efesoLogoPath = '/efeso.png';
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+  const logoPath = `${basePath}/logo.png`;
+  const efesoLogoPath = `${basePath}/efeso.png`;
 
   const passengers: { cognome: string; nome: string }[] = [];
   const mainCognome = (data.customerLastName || '').trim().toUpperCase();

@@ -474,8 +474,8 @@ export default function Home() {
     return generateFlightModuleHtml(data);
   }, [voloPraticaNumber, voloPreventivoNumber, voloPreventivoCreatedAt, voloBagaglioStivaKg, voloBagaglioManoKg, customerFirstName, customerLastName, voloOtherPassengers, voloCompagnia, voloCittaPartenza, voloAndata, voloRitorno]);
 
-  // Fix image path for GitHub Pages
-  const logoPath = process.env.NODE_ENV === 'production' ? '/Prev3/logo.png' : '/logo.png';
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+  const logoPath = `${basePath}/logo.png`;
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);

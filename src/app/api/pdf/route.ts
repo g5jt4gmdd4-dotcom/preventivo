@@ -9,8 +9,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'HTML content is required' }, { status: 400 });
     }
 
-    // Add base tag to resolve relative URLs like /logo.png
-    const baseUrl = new URL(req.url).origin;
+    // Add base tag so /logo.png and subfolder paths resolve correctly
+    const origin = new URL(req.url).origin;
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+    const baseUrl = basePath ? `${origin}${basePath}` : origin;
     const htmlWithBase = html.replace('<head>', `<head><base href="${baseUrl}/">`);
 
     const browser = await puppeteer.launch({

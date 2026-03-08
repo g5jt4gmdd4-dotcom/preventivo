@@ -1,6 +1,15 @@
 import { sql } from '@vercel/postgres';
 import { NextResponse } from 'next/server';
 
+function logDbError(context: string, error: unknown): void {
+  const err = error instanceof Error ? error : new Error(String(error));
+  const hasConnection = /connection|ECONNREFUSED|connect|POSTGRES_|DATABASE_URL/i.test(err.message);
+  const hasTable = /relation.*does not exist|table.*not found/i.test(err.message);
+  console.error(`[history/${context}]`, err.name, err.message);
+  if (hasConnection) console.error('[history] Probabile problema di connessione DB (verificare variabili POSTGRES_* / DATABASE_URL).');
+  if (hasTable) console.error('[history] Tabella mancante o schema non inizializzato.');
+}
+
 async function initDb() {
   await sql`
     CREATE TABLE IF NOT EXISTS quotes (
@@ -37,9 +46,10 @@ export async function POST(request: Request) {
     `;
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    console.error('Error in POST /api/history:', error);
-    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+  } catch (error: unknown) {
+    logDbError('POST', error);
+    const message = error instanceof Error ? error.message : 'Internal Server Error';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -83,9 +93,10 @@ export async function GET(request: Request) {
     }
     
     return NextResponse.json(rows);
-  } catch (error: any) {
-    console.error('Error in GET /api/history:', error);
-    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+  } catch (error: unknown) {
+    logDbError('GET', error);
+    const message = error instanceof Error ? error.message : 'Internal Server Error';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -110,8 +121,9 @@ export async function DELETE(request: Request) {
     }
     await sql`DELETE FROM quotes WHERE client_name = ${clientName}`;
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    console.error('Error in DELETE /api/history:', error);
-    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+  } catch (error: unknown) {
+    logDbError('DELETE', error);
+    const message = error instanceof Error ? error.message : 'Internal Server Error';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
