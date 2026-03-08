@@ -1852,14 +1852,22 @@ export default function Home() {
                     <button
                       onClick={async () => {
                         await saveQuoteToHistory('conferma');
-                        const fileName = `caparra ${customerLastName || 'cliente'}.pdf`.trim();
+                        let baseName = `caparra ${customerLastName || 'cliente'}`;
+                        if (mode === 'flight') {
+                           baseName = `${customerLastName || 'cliente'} ${voloCittaPartenza || ''}`.trim();
+                        }
+                        const fileName = `${baseName}.pdf`;
+
+                        // Converte i percorsi relativi delle immagini (es. loghi) in URL assolute 
+                        // per permettere al servizio sterno Browserless di caricarli correttamente.
+                        const absoluteHtml = htmlOutput.replace(/src="(\/[^"]+)"/g, `src="${window.location.origin}$1"`);
                         
                         try {
                           const response = await fetch('/api/pdf', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ 
-                              html: htmlOutput, 
+                              html: absoluteHtml, 
                               fileName 
                             }),
                           });
