@@ -271,8 +271,8 @@ export function generateHtml(res: QuoteResult): string {
     `}).join('');
 
     restaurantHtml = `
-      <div style="margin-top: ${sectionMar}; margin-bottom: ${sectionMar};">
-        <table style="width: 680px; max-width: 100%; border-collapse: collapse; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; table-layout: fixed;">
+      <div style="margin-top: ${sectionMar}; margin-bottom: ${sectionMar};" align="center">
+        <table width="680" align="center" style="width: 680px; max-width: 100%; margin: 0 auto; border-collapse: collapse; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; table-layout: fixed;">
           <thead style="background-color: #f1f5f9;">
             <tr>
               <th style="padding: ${cellPad}; text-align: center; color: #000000; font-size: 10pt; text-transform: uppercase; font-family: Aptos, sans-serif; width: 25%;">Periodo</th>
@@ -391,8 +391,8 @@ export function generateHtml(res: QuoteResult): string {
         ` : ''}
 
         <!-- Cost Table -->
-        <div style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; margin-bottom: 20px;">
-          <table style="width: 680px; max-width: 100%; border-collapse: collapse; table-layout: fixed;">
+        <div style="margin-bottom: 20px;" align="center">
+          <table width="680" align="center" style="width: 680px; max-width: 100%; margin: 0 auto; border-collapse: collapse; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; table-layout: fixed;">
             <thead>
               <tr style="background-color: #f1f5f9; border-bottom: 1px solid #e2e8f0;">
                 <th style="padding: 12px; text-align: center; color: #000000; font-size: 10pt; text-transform: uppercase; font-family: Aptos, Calibri, sans-serif; width: 25%;">Periodo</th>
@@ -477,9 +477,9 @@ export function generateHtml(res: QuoteResult): string {
       </div>
 
       <!-- Seconda Tabella Ultra-Compatta (Ancorata al Fondo) -->
-      <div style="margin-top: auto; border-top: 1px dashed #ccc; padding-top: 20px; flex-shrink: 0; padding-bottom: 10px;">
+      <div style="margin-top: auto; border-top: 1px dashed #ccc; padding-top: 20px; flex-shrink: 0; padding-bottom: 10px;" align="center">
         <div style="font-size: 9pt; font-weight: bold; color: #666; margin-bottom: 8px; text-transform: uppercase;">Riepilogo Interno</div>
-        <table style="width: 680px; max-width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb; font-size: 9pt;">
+        <table width="680" align="center" style="width: 680px; max-width: 100%; margin: 0 auto; border-collapse: collapse; border: 1px solid #e5e7eb; font-size: 9pt;">
           <thead>
             <tr style="background-color: #f8fafc; border-bottom: 2px solid #3b82f6;">
               <th style="padding: 3px 6px; text-align: center; border: 1px solid #e5e7eb; color: #1e3a8a; width: 25%;">Periodo</th>
@@ -515,7 +515,8 @@ export function generateHtml(res: QuoteResult): string {
 
     ${!isPage2 ? `
     <!-- Grand Total Section (Page 1 Only) -->
-    <table cellpadding="0" cellspacing="0" border="0" bgcolor="#eff6ff" style="width: 680px; max-width: 100%; margin-bottom: ${sectionMar}; border-collapse: separate; border-spacing: 0; background-color: #eff6ff; border: 1px solid #dbeafe; border-radius: 8px;">
+    <div align="center" style="margin-bottom: ${sectionMar};">
+    <table width="680" align="center" cellpadding="0" cellspacing="0" border="0" bgcolor="#eff6ff" style="width: 680px; max-width: 100%; margin: 0 auto; border-collapse: separate; border-spacing: 0; background-color: #eff6ff; border: 1px solid #dbeafe; border-radius: 8px;">
       <tr>
         <td align="center" style="padding: ${sectionMar === '30px' ? '20px' : '12px'};">
           <table width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -537,6 +538,7 @@ export function generateHtml(res: QuoteResult): string {
         </td>
       </tr>
     </table>
+    </div>
     ` : ''}
 
     ${!res.isConferma ? restaurantHtml : ''}
@@ -659,16 +661,20 @@ export function generateHtml(res: QuoteResult): string {
   </head>
   <body style="font-family: 'Inter', Aptos, sans-serif; font-size: 11pt; color: #000000; margin: 0; padding: 0;">
     
-    <div class="preview-page" data-page="Pagina 1">
-      ${getPageContentHtml(1)}
+    <div class="preview-page" data-page="Pagina 1" align="center">
+      <div style="width: 680px; max-width: 100%; margin: 0 auto; text-align: left;">
+        ${getPageContentHtml(1)}
+      </div>
     </div> <!-- End Page 1 -->
 
 
     ${res.isConferma ? `
     <!-- PAGE 2 (COPY IDENTICAL TO THE FIRST ONE) -->
     <div class="page-break"></div>
-    <div class="preview-page" data-page="Pagina 2">
-      ${getPageContentHtml(2)}
+    <div class="preview-page" data-page="Pagina 2" align="center">
+      <div style="width: 680px; max-width: 100%; margin: 0 auto; text-align: left;">
+        ${getPageContentHtml(2)}
+      </div>
     </div>
     ` : ''}
 
